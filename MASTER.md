@@ -11,34 +11,40 @@ public signe. Il reste un projet personnel.
 
 ## Etat courant
 
-- Projet tout juste initialise.
-- Aucun code de jeu n'existe encore dans le dossier local.
+- Prototype web jouable cree en React/TypeScript.
+- Regles Othello implementees et couvertes par tests unitaires.
+- Build frontend valide.
+- Packaging Tauri desktop non valide pour l'instant : le build Rust complet a
+  ete bloque par une limite systeme de memoire/fichier de pagination Windows.
 - Le depot GitHub de reference est `https://github.com/kinowill/OTHELLO-ISLAND`.
 - Direction artistique de base retenue : ile mystique premium, avec symbolique
   occulte et esoterique fictionnelle.
 
 ## Stack
 
-La stack n'est pas encore arretee.
-
-Options a arbitrer :
+Stack retenue :
 
 - Application desktop web embarquee : Tauri + React + TypeScript.
-- Moteur jeu : Godot.
-- Jeu web/desktop simple : TypeScript + Canvas/WebGL + packaging ulterieur.
+- Build frontend : Vite.
+- Langage UI et logique de jeu : TypeScript.
+- Packaging PC cible : Tauri, apres stabilisation du prototype web.
 
-Le choix devra tenir compte du niveau de design voulu, de la facilite de build
-Windows, de la gestion audio et de la maintenance par IA.
+Raison : Othello est un jeu de regles, d'interface, d'animations et d'ambiance.
+Tauri + React permet de produire un executable PC tout en gardant une base UI
+facile a iterer, tester et maintenir.
 
 ## Structure des dossiers
 
-A definir apres choix de stack.
-
-Structure documentaire actuelle :
+Structure actuelle :
 
 - `MASTER.md` : source principale de verite projet.
 - `ROADMAP.md` : backlog et etapes de travail.
 - `VALIDATION.md` : journal des validations reelles.
+- `src/` : application React et logique Othello.
+- `src/game/othello.ts` : moteur de regles Othello.
+- `src/game/othello.test.ts` : tests unitaires des regles.
+- `src-tauri/` : scaffold Tauri pour futur packaging PC.
+- `dist/` : sortie de build frontend, non versionnee.
 
 ## Sources de verite
 
@@ -67,3 +73,7 @@ Structure documentaire actuelle :
 - Les musiques devront etre gerees comme des assets locaux fournis par
   l'utilisateur ou generes/specifies separement. Le projet ne doit pas inclure
   de contenu pirate ou redistribue sans droit dans le depot.
+- Les assets visuels importants pourront etre crees separement par
+  l'utilisateur via generation d'image, puis integres au projet quand leur role
+  est clair. Le prototype doit d'abord fonctionner avec des formes, textures et
+  styles generes en code.

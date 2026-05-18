@@ -54,3 +54,61 @@ Decision :
 - La symbolique occulte/esoterique doit rester subtile, elegante et cryptique.
 - A eviter : rendu trop edgy, goofy, evident, meme internet, horreur adolescente
   ou conspiration trop litterale.
+
+## 2026-05-18 - Stack et strategie assets
+
+Etat :
+
+- Repo local : documentation modifiee pour acter la stack et la strategie
+  d'assets.
+- Prod alignee : non applicable, aucun build ni deploiement.
+- Validation reelle : decision de cadrage uniquement, aucun scaffold ni build
+  encore valide.
+
+Decision :
+
+- Stack retenue : Tauri + React + TypeScript, avec Vite pour le developpement
+  frontend.
+- Le prototype initial doit fonctionner sans assets externes. Les assets
+  visuels generes via image IA seront demandes ensuite avec des briefs precis.
+
+## 2026-05-18 - Prototype web initial
+
+Etat :
+
+- Repo local : scaffold React/Vite/Tauri cree, prototype web Othello jouable
+  implemente.
+- Prod alignee : non applicable, aucun deploiement.
+- Validation reelle : validations automatisees frontend effectuees ; validation
+  visuelle navigateur non effectuee dans cette passe apres incident memoire.
+
+Ce qui est implemente :
+
+- Plateau 8x8.
+- Coups legaux detectes.
+- Retournement des pions.
+- Passage de tour automatique si l'adversaire n'a aucun coup.
+- Detection de fin de partie et vainqueur.
+- Mode humain contre humain local.
+- Premiere direction visuelle codee en CSS : ile mystique premium, plateau
+  rituel, symbolique subtile.
+
+Commandes/verifications effectuees :
+
+- `npm install` : dependances installees, 0 vulnerabilite signalee.
+- `npm run lint` : OK.
+- `npm test` : OK hors sandbox, 4 tests unitaires passes.
+- `npm run build` : OK, build frontend genere dans `dist/`.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `npm run tauri build` : KO. Le build frontend passe, mais la compilation
+  Rust/Tauri echoue ensuite avec une erreur Windows de fichier de pagination
+  insuffisant (`os error 1455`). Une tentative avec `CARGO_BUILD_JOBS=1` a aussi
+  echoue par manque de memoire au niveau Node/TypeScript.
+
+Decision operationnelle :
+
+- Ne pas relancer de build Tauri complet automatiquement dans cette session.
+- Continuer les iterations avec validations legeres : lint, tests, build
+  frontend.
+- Reprendre le packaging desktop plus tard, explicitement, quand la machine a
+  assez de ressources disponibles ou apres ajustement du fichier de pagination.

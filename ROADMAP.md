@@ -8,11 +8,18 @@ artistique, audio et mode de distribution PC.
 ## A faire maintenant
 
 - [x] Creer les sources de verite initiales du projet.
-- [ ] Choisir la stack technique.
-- [ ] Definir le perimetre du premier prototype jouable.
+- [x] Choisir la stack technique.
+- [x] Definir le perimetre du premier prototype jouable.
 - [x] Definir la direction visuelle de base.
 - [ ] Produire une mini bible artistique : couleurs, formes, symboles, ambiance.
-- [ ] Definir la strategie audio et les contraintes d'assets.
+- [x] Definir la strategie initiale d'assets visuels.
+- [ ] Definir la strategie audio et les contraintes d'assets musicaux.
+- [x] Creer le scaffold React/Tauri.
+- [x] Implementer le premier prototype jouable humain contre humain.
+- [x] Valider les regles par tests unitaires.
+- [x] Valider le build frontend.
+- [ ] Valider le packaging Tauri desktop sur une machine avec ressources
+  systeme suffisantes.
 
 ## Prototype jouable vise
 
@@ -21,6 +28,8 @@ artistique, audio et mode de distribution PC.
   detection de fin de partie, score.
 - Mode humain contre humain local.
 - Interface PC claire et agreable.
+- Pas d'IA dans le premier prototype.
+- Pas de dependance a des assets externes dans le premier prototype.
 
 ## Etapes suivantes probables
 
@@ -35,10 +44,27 @@ artistique, audio et mode de distribution PC.
 
 ## Bloque ou a arbitrer
 
-- Stack technique non choisie.
 - Bible artistique detaillee non creee.
 - Niveau d'IA attendu non choisi.
 - Type de musiques et droits d'utilisation non clarifies.
+- Packaging Tauri desktop bloque localement par une erreur Windows de
+  memoire/fichier de pagination pendant la compilation Rust complete.
+
+## Stack retenue
+
+- Tauri + React + TypeScript.
+- Vite pour le developpement frontend.
+- Prototype initial jouable dans le navigateur local avant packaging PC.
+- Tauri servira a produire l'application desktop quand la boucle de jeu sera
+  stable.
+
+## Assets visuels
+
+- Le prototype initial ne depend pas d'assets externes : il doit etre jouable
+  avec CSS, formes vectorielles simples et textures procedurales.
+- Les assets generes par image IA seront demandes plus tard avec des briefs
+  precis : fond principal, textures de plateau, icones/sceaux, pions,
+  eventuellement jaquette ou splash screen.
 
 ## Direction artistique retenue
 
