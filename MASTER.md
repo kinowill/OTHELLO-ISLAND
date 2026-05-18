@@ -14,6 +14,8 @@ public signe. Il reste un projet personnel.
 - Projet tout juste initialise.
 - Aucun code de jeu n'existe encore dans le dossier local.
 - Le depot GitHub de reference est `https://github.com/kinowill/OTHELLO-ISLAND`.
+- Direction artistique de base retenue : ile mystique premium, avec symbolique
+  occulte et esoterique fictionnelle.
 
 ## Stack
 
@@ -51,7 +53,13 @@ Structure documentaire actuelle :
 - Le projet est un jeu PC Othello/Reversi.
 - Le nom de travail est `Othello Island`.
 - Le depot GitHub de reference est `kinowill/OTHELLO-ISLAND`.
+- La direction visuelle vise une ambiance ile/fantasy stylisee, sobre et
+  premium, enrichie de symboles occultes et esoteriques fictifs : oeil,
+  pyramide, compas, geometrie sacree, sceaux, cercles rituels, runes inventees,
+  codes visuels evoquant les societes secretes, l'Illuminati pop-culture et
+  les theories de complot d'elite.
+- Le jeu doit utiliser ces references comme esthetique de mystere et de pouvoir,
+  pas comme affirmation politique ou accusation contre des groupes reels.
 - Les musiques devront etre gerees comme des assets locaux fournis par
   l'utilisateur ou generes/specifies separement. Le projet ne doit pas inclure
   de contenu pirate ou redistribue sans droit dans le depot.
-

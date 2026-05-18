@@ -22,3 +22,20 @@ Commandes/verifications effectuees :
   configuration effectuee apres autorisation hors sandbox, car Git ne pouvait
   pas verrouiller `.git/config` dans le sandbox.
 - Commit initial `docs: initialize project truth` pousse sur `origin/main`.
+
+## 2026-05-18 - Direction artistique
+
+Etat :
+
+- Repo local : documentation modifiee pour acter la direction artistique.
+- Prod alignee : non applicable, aucun build ni deploiement.
+- Validation reelle : decision de cadrage uniquement, aucun rendu graphique
+  encore produit ni teste.
+
+Decision :
+
+- Direction retenue : ile mystique premium avec symbolique occulte/esoterique
+  fictionnelle, inspiree de codes pop-culture de societes secretes, Illuminati
+  et theories de complot d'elite.
+- Limite explicite : ces references servent l'atmosphere et ne doivent pas etre
+  presentees comme des accusations ou faits reels.
