@@ -37,22 +37,32 @@ function App() {
 
   const statusText = game.winner
     ? game.winner === "draw"
-      ? "Rituel termine, equilibre parfait."
-      : `Rituel termine, ${playerLabels[game.winner]} domine l'ile.`
+      ? "Partie terminee, egalite."
+      : `Partie terminee, ${playerLabels[game.winner]} gagne.`
     : game.consecutivePasses > 0
-      ? `${playerLabels[game.currentPlayer]} rejoue, aucun passage adverse.`
-      : `${playerLabels[game.currentPlayer]} trace le prochain sceau.`;
+      ? `${playerLabels[game.currentPlayer]} rejoue : aucun coup adverse.`
+      : `${playerLabels[game.currentPlayer]} a jouer.`;
 
   return (
     <main className="app-shell">
       <section className="game-stage" aria-label="Prototype Othello Island">
         <div className="atmosphere" aria-hidden="true" />
+        <div className="island-map" aria-hidden="true">
+          <span className="contour contour-a" />
+          <span className="contour contour-b" />
+          <span className="contour contour-c" />
+          <span className="chart-line chart-line-a" />
+          <span className="chart-line chart-line-b" />
+          <span className="chart-star chart-star-a" />
+          <span className="chart-star chart-star-b" />
+          <span className="chart-star chart-star-c" />
+        </div>
         <header className="title-block">
           <p className="eyebrow">Prototype jouable</p>
           <h1>Othello Island</h1>
           <p className="subtitle">
-            Un plateau rituel, des pierres en opposition, une victoire par
-            encerclement.
+            Un Othello classique pose sur une table d'ile ancienne : signes
+            graves, cartes effacees, lumiere basse.
           </p>
         </header>
 
@@ -76,7 +86,7 @@ function App() {
             </div>
             <p className="lead-copy">
               {lead === 0
-                ? "Le cercle reste parfaitement balance."
+                ? "La position est equilibree."
                 : `${lead > 0 ? "Noir" : "Blanc"} mene de ${Math.abs(lead)}.`}
             </p>
           </aside>
@@ -135,7 +145,7 @@ function App() {
               onClick={() => setGame(createInitialGame())}
               type="button"
             >
-              Nouveau rituel
+              Nouvelle partie
             </button>
           </aside>
         </section>
@@ -145,4 +155,3 @@ function App() {
 }
 
 export default App;
-

@@ -68,6 +68,10 @@ Structure actuelle :
   integres dans les matieres, gravures, interfaces, animations et details
   decouvrables. Eviter le rendu trop edgy, goofy, horrifique adolescent ou
   trop evident.
+- Le texte visible de l'interface doit rester sobre et direct. L'ambiance
+  mystique doit venir d'abord de la composition, des matieres, de la lumiere et
+  des signes visuels, pas de libelles forces comme "rituel" ou "sceau" sur les
+  actions courantes.
 - Le jeu doit utiliser ces references comme esthetique de mystere et de pouvoir,
   pas comme affirmation politique ou accusation contre des groupes reels.
 - Les musiques devront etre gerees comme des assets locaux fournis par

@@ -130,3 +130,35 @@ Commandes/verifications effectuees :
 - `http://127.0.0.1:1420` : HTTP 200.
 - Port 1420 en ecoute localement, PID serveur observe : `36316`.
 - Packaging Tauri/Rust non relance.
+
+## 2026-05-18 - Correction ton UI et identite visuelle
+
+Etat :
+
+- Repo local : textes UI et CSS modifies apres retour utilisateur.
+- Prod alignee : non applicable, aucun deploiement.
+- Validation reelle : validations automatisees legeres effectuees ; revue
+  visuelle humaine a poursuivre dans le navigateur local ouvert.
+
+Retour utilisateur traite :
+
+- "Nouveau rituel" juge trop edgy.
+- Phrase d'introduction jugee forcee et peu claire.
+- Premiere version visuelle jugee encore trop proche d'un Othello classique.
+
+Changements effectues :
+
+- Remplacement des textes UI forces par des libelles plus directs : "Nouvelle
+  partie", "Partie terminee", "a jouer".
+- Ajout d'elements visuels codes pour distinguer l'identite : carte d'ile en
+  arriere-plan, lignes de compas autour du plateau, pions legerement graves.
+- Principe confirme : l'ambiance doit venir du visuel, pas d'un vocabulaire
+  occultisant plaque sur les actions de base.
+
+Commandes/verifications effectuees :
+
+- `npm run build` : OK.
+- `npm run lint` : OK, relance seul apres un echec memoire cause par execution
+  parallele avec le build.
+- `npm test` : OK hors sandbox, 4 tests unitaires passes.
+- Packaging Tauri/Rust non relance.
