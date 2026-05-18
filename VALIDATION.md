@@ -112,3 +112,21 @@ Decision operationnelle :
   frontend.
 - Reprendre le packaging desktop plus tard, explicitement, quand la machine a
   assez de ressources disponibles ou apres ajustement du fichier de pagination.
+
+## 2026-05-18 - Lancement local leger
+
+Etat :
+
+- Repo local : code inchange, serveur de developpement Vite lance localement.
+- Prod alignee : non applicable, aucun deploiement.
+- Validation reelle : verification HTTP locale effectuee ; inspection visuelle
+  ouverte dans le navigateur Windows pour revue humaine.
+
+Commandes/verifications effectuees :
+
+- `npm run dev -- --host 127.0.0.1` : bloque dans le sandbox par `spawn EPERM`
+  au demarrage d'esbuild.
+- Serveur relance hors sandbox : OK.
+- `http://127.0.0.1:1420` : HTTP 200.
+- Port 1420 en ecoute localement, PID serveur observe : `36316`.
+- Packaging Tauri/Rust non relance.
