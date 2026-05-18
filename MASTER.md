@@ -58,6 +58,10 @@ Structure documentaire actuelle :
   pyramide, compas, geometrie sacree, sceaux, cercles rituels, runes inventees,
   codes visuels evoquant les societes secretes, l'Illuminati pop-culture et
   les theories de complot d'elite.
+- Le traitement artistique doit rester subtil, elegant et cryptique : symboles
+  integres dans les matieres, gravures, interfaces, animations et details
+  decouvrables. Eviter le rendu trop edgy, goofy, horrifique adolescent ou
+  trop evident.
 - Le jeu doit utiliser ces references comme esthetique de mystere et de pouvoir,
   pas comme affirmation politique ou accusation contre des groupes reels.
 - Les musiques devront etre gerees comme des assets locaux fournis par

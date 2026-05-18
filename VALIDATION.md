@@ -39,3 +39,18 @@ Decision :
   et theories de complot d'elite.
 - Limite explicite : ces references servent l'atmosphere et ne doivent pas etre
   presentees comme des accusations ou faits reels.
+
+## 2026-05-18 - Ton visuel
+
+Etat :
+
+- Repo local : documentation modifiee pour preciser le ton de la symbolique.
+- Prod alignee : non applicable, aucun build ni deploiement.
+- Validation reelle : decision de cadrage uniquement, aucun rendu graphique
+  encore produit ni teste.
+
+Decision :
+
+- La symbolique occulte/esoterique doit rester subtile, elegante et cryptique.
+- A eviter : rendu trop edgy, goofy, evident, meme internet, horreur adolescente
+  ou conspiration trop litterale.

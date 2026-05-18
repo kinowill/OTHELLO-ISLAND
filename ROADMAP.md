@@ -55,6 +55,10 @@ References visuelles autorisees :
 
 Limite :
 
+- Garder un traitement subtil, cryptique et premium : le joueur doit sentir un
+  ordre cache ou un rituel, pas recevoir un collage evident de symboles.
+- Eviter le ton edgy, goofy, meme internet, horreur adolescente ou conspiration
+  trop litterale.
 - Ne pas transformer le jeu en manifeste politique ou en accusation contre des
   groupes reels.
 - Eviter de recopier servilement un embleme officiel existant si un symbole
