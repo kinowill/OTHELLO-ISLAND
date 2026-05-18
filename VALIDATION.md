@@ -5,7 +5,8 @@
 Etat :
 
 - Repo local : documents de cadrage initial crees, depot git initialise sur
-  `main`, remote `origin` configure vers GitHub.
+  `main`, remote `origin` configure vers GitHub. Les documents initiaux ont
+  ete commits et pousses sur `origin/main`.
 - Prod alignee : non applicable, aucun build ni deploiement.
 - Validation reelle : aucune validation de jeu possible, aucun code jouable.
 
@@ -20,3 +21,4 @@ Commandes/verifications effectuees :
 - `git remote add origin https://github.com/kinowill/OTHELLO-ISLAND.git` :
   configuration effectuee apres autorisation hors sandbox, car Git ne pouvait
   pas verrouiller `.git/config` dans le sandbox.
+- Commit initial `docs: initialize project truth` pousse sur `origin/main`.
