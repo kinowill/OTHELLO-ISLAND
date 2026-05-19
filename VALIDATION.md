@@ -741,3 +741,16 @@ Artefacts generes :
 - `src-tauri/target/release/othello-island.exe`
 - `src-tauri/target/release/bundle/msi/Othello Island_0.1.0_x64_en-US.msi`
 - `src-tauri/target/release/bundle/nsis/Othello Island_0.1.0_x64-setup.exe`
+
+## 2026-05-19 - Push GitHub kit parametres et icone
+
+Etat :
+
+- Repo local : commit `956a173` cree sur `main`.
+- GitHub : commit `956a173` pousse sur `origin/main`.
+- Distribution locale : installateur Windows regenere avant le push.
+- Release publique : non publiee. Le code source et les assets sont publics sur
+  GitHub, mais aucun installateur n'a ete publie comme GitHub Release.
+- Validation reelle : validations automatisees effectuees avant commit. Retest
+  manuel de l'installateur, du nouveau panneau de parametres, du curseur, de
+  l'icone installee et du mix audio encore a faire.
