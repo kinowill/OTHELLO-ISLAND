@@ -783,3 +783,15 @@ Commandes/verifications effectuees :
 - `npm audit --audit-level=high` : OK, 0 vulnerabilite.
 - `git diff --check` : OK.
 - `npm run tauri build` : OK, artefacts Windows regeneres.
+
+## 2026-05-19 - Push GitHub correction curseur
+
+Etat :
+
+- Repo local : commit `5ee10f9` cree sur `main`.
+- GitHub : commit `5ee10f9` pousse sur `origin/main`.
+- Distribution locale : installateur Windows regenere avant le push.
+- Release publique : non publiee. Le code source est pousse, mais aucun
+  installateur n'a ete publie comme GitHub Release.
+- Validation reelle : validations automatisees effectuees avant commit. Retest
+  manuel du curseur dans l'application installee encore a faire a la reprise.
