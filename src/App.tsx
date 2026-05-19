@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import {
   applyMove,
   countDiscs,
@@ -15,9 +21,9 @@ type Screen = "menu" | "game";
 type DisplayMode = "borderless" | "fullscreen" | "windowed";
 
 const DEFAULT_AUDIO_MIX: AudioMix = {
-  ambience: 0.86,
-  music: 0.72,
-  ui: 0.82,
+  ambience: 0.68,
+  music: 0.9,
+  ui: 0.78,
 };
 
 const displayModeLabels: Record<DisplayMode, string> = {
@@ -167,6 +173,9 @@ function App() {
     setDisplayMode(mode);
   };
 
+  const volumeStyle = (value: number): CSSProperties =>
+    ({ "--volume-level": `${Math.round(value * 100)}%` }) as CSSProperties;
+
   const playMove = (position: Position) => {
     const next = applyMove(game, position);
 
@@ -219,13 +228,11 @@ function App() {
     <div className="settings-overlay" role="dialog" aria-modal="true">
       <section className="settings-panel" aria-label="Parametres">
         <div className="settings-header">
-          <div>
-            <p className="panel-kicker">Configuration</p>
-            <h2>Parametres</h2>
-          </div>
+          <div className="settings-title-art" aria-hidden="true" />
+          <h2 className="sr-only">Parametres</h2>
           <button
             aria-label="Fermer les parametres"
-            className="icon-button"
+            className="icon-button settings-close-button"
             onClick={() => {
               playSelectSound();
               setSettingsOpen(false);
@@ -233,13 +240,23 @@ function App() {
             type="button"
             {...hoverAudioProps}
           >
-            X
+            Retour
           </button>
         </div>
 
+        <div className="settings-tabs" aria-hidden="true">
+          <span className="settings-tab settings-tab-display" />
+          <span className="settings-tab settings-tab-audio" />
+          <span className="settings-tab settings-tab-gameplay" />
+          <span className="settings-tab settings-tab-controls" />
+        </div>
+
         <div className="settings-list">
-          <div className="settings-group">
-            <p className="panel-kicker">Affichage</p>
+          <div className="settings-group settings-group-display">
+            <div className="settings-group-title">
+              <span className="settings-icon settings-icon-display" aria-hidden="true" />
+              <p className="panel-kicker">Affichage</p>
+            </div>
             <div className="display-mode-grid" aria-label="Mode d'affichage">
               {(Object.keys(displayModeLabels) as DisplayMode[]).map((mode) => (
                 <button
@@ -247,6 +264,7 @@ function App() {
                   disabled={displayMode === mode}
                   key={mode}
                   onClick={() => changeDisplayMode(mode)}
+                  aria-pressed={displayMode === mode}
                   type="button"
                   {...(displayMode === mode ? {} : hoverAudioProps)}
                 >
@@ -256,44 +274,57 @@ function App() {
             </div>
           </div>
 
-          <label className="option-toggle">
-            <input
-              checked={audioEnabled}
-              onChange={(event) => {
-                playSelectSound();
-                setAudioEnabled(event.target.checked);
-              }}
-              type="checkbox"
-            />
-            <span aria-hidden="true" />
-            <em>Ambiance sonore</em>
-          </label>
+          <div className="settings-group settings-group-gameplay">
+            <div className="settings-group-title">
+              <span className="settings-icon settings-icon-gameplay" aria-hidden="true" />
+              <p className="panel-kicker">Gameplay</p>
+            </div>
 
-          <label className="option-toggle">
-            <input
-              checked={showLegalMoves}
-              onChange={(event) => {
-                playSelectSound();
-                setShowLegalMoves(event.target.checked);
-              }}
-              type="checkbox"
-            />
-            <span aria-hidden="true" />
-            <em>Afficher les coups possibles</em>
-          </label>
+            <label className="option-toggle">
+              <input
+                checked={audioEnabled}
+                onChange={(event) => {
+                  playSelectSound();
+                  setAudioEnabled(event.target.checked);
+                }}
+                type="checkbox"
+              />
+              <span aria-hidden="true" />
+              <em>Ambiance sonore</em>
+            </label>
 
-          <div className="asset-placeholder">
-            <p className="panel-kicker">Audio</p>
+            <label className="option-toggle">
+              <input
+                checked={showLegalMoves}
+                onChange={(event) => {
+                  playSelectSound();
+                  setShowLegalMoves(event.target.checked);
+                }}
+                type="checkbox"
+              />
+              <span aria-hidden="true" />
+              <em>Afficher les coups possibles</em>
+            </label>
+          </div>
+
+          <div className="asset-placeholder asset-placeholder-audio">
+            <div className="settings-group-title">
+              <span className="settings-icon settings-icon-audio" aria-hidden="true" />
+              <p className="panel-kicker">Audio</p>
+            </div>
             <strong>{audioEnabled ? "Ambiance active" : "Ambiance coupee"}</strong>
             <p>
-              Ocean et musique tournent en boucle. Le vent revient avec des
-              delais aleatoires pour eviter une synchro fixe avec l'ocean.
+              Musique legerement devant le decor sonore. Ocean en fondue, vent
+              aleatoire, depart musical retarde.
             </p>
           </div>
 
-          <div className="settings-group">
-            <p className="panel-kicker">Mixage</p>
-            <label className="volume-control">
+          <div className="settings-group settings-group-audio">
+            <div className="settings-group-title">
+              <span className="settings-icon settings-icon-controls" aria-hidden="true" />
+              <p className="panel-kicker">Mixage</p>
+            </div>
+            <label className="volume-control" style={volumeStyle(audioMix.music)}>
               <span>Musique</span>
               <input
                 aria-label="Volume musique"
@@ -305,7 +336,7 @@ function App() {
               />
               <strong>{Math.round(audioMix.music * 100)}%</strong>
             </label>
-            <label className="volume-control">
+            <label className="volume-control" style={volumeStyle(audioMix.ambience)}>
               <span>Ambiance</span>
               <input
                 aria-label="Volume ambiance"
@@ -317,7 +348,7 @@ function App() {
               />
               <strong>{Math.round(audioMix.ambience * 100)}%</strong>
             </label>
-            <label className="volume-control">
+            <label className="volume-control" style={volumeStyle(audioMix.ui)}>
               <span>UI</span>
               <input
                 aria-label="Volume interface"
@@ -331,8 +362,11 @@ function App() {
             </label>
           </div>
 
-          <div className="asset-placeholder">
-            <p className="panel-kicker">Textures</p>
+          <div className="asset-placeholder asset-placeholder-warning">
+            <div className="settings-group-title">
+              <span className="settings-icon settings-icon-warning" aria-hidden="true" />
+              <p className="panel-kicker">Textures</p>
+            </div>
             <strong>Non integrees</strong>
             <p>
               Les textures definitives seront generees en 32-bit puis ajoutees

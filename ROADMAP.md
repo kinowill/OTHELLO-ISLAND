@@ -40,6 +40,11 @@ identite visuelle, audio et premiere experience installee.
   plein ecran et fenetre fixe `1600x900`.
 - [x] Lancer l'ambiance en fade-in et retarder la musique au demarrage.
 - [x] Eviter le son de hover sur les boutons grises.
+- [x] Rehausser la musique par defaut pour qu'elle passe devant l'ambiance.
+- [x] Integrer le kit UI `ASSETS/02` dans les parametres : panneau, onglets,
+  boutons, toggles, sliders, icones et curseur custom.
+- [x] Remplacer l'icone applicative provisoire par l'icone Othello Island
+  fournie par l'utilisateur.
 - [ ] Retester l'installateur Windows apres ecran d'accueil, parametres, retour
   menu, correction de taille de fenetre et option de coups possibles.
 - [ ] Cadrer les options completes.
@@ -77,13 +82,14 @@ identite visuelle, audio et premiere experience installee.
 - Bible artistique detaillee non creee.
 - Niveau d'IA attendu non choisi.
 - Type de musiques et droits d'utilisation non clarifies.
-- Premiers assets audio fournis et integres. Mixage final et sliders de volume
-  a retester a l'oreille dans l'application installee.
+- Premiers assets audio fournis et integres. Mixage par defaut corrige pour
+  favoriser la musique, mais le niveau final reste a retester a l'oreille dans
+  l'application installee.
 - Forme exacte de l'histoire / secret a debloquer non definie.
 - Systeme d'evolution visuelle en partie a definir : lumiere, textures,
   details de decor, et conditions de changement.
-- Assets d'accueil 32-bit integres. Les autres textures de jeu restent a
-  definir et integrer.
+- Assets d'accueil et kit de parametres 32-bit integres. Les autres textures de
+  jeu restent a definir et integrer.
 - Mode responsive/letterbox non implemente : la version courante privilegie une
   base `1600x900` avec mode plein ecran fenetre sans bordure par defaut,
   plus options vrai plein ecran et fenetre fixe. Ces modes sont a retester dans

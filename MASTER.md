@@ -24,11 +24,13 @@ public signe. Il reste un projet personnel.
   fond nocturne, logo, panneau de menu, boutons et footer.
 - Accueil compose sur une base `1600x900`, avec mode par defaut en plein
   ecran fenetre sans bordure applique au lancement.
-- Parametres enrichis : mode d'affichage, ambiance sonore, coups possibles et
-  mixage separe musique / ambiance / UI.
+- Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
+  ambiance sonore, coups possibles, mixage separe musique / ambiance / UI,
+  curseur custom et lueurs de panneau.
 - Audio procedural retire apres test utilisateur negatif. Premiere integration
   audio par assets locaux : ocean nocturne, musique menu retardee avec fade-in,
-  vent aleatoire, hover et select UI.
+  vent aleatoire, hover et select UI. Le mix par defaut place maintenant la
+  musique legerement devant l'ambiance.
 - Le depot GitHub de reference est `https://github.com/kinowill/OTHELLO-ISLAND`.
 - Direction artistique canonique : retro 32-bit / pixel art propre, ambiance
   PC CD-ROM sombre, ile mysterieuse, dossiers confidentiels fictionnels.
@@ -61,8 +63,11 @@ Structure actuelle :
 - `src/game/othello.ts` : moteur de regles Othello.
 - `src/game/othello.test.ts` : tests unitaires des regles.
 - `src-tauri/` : configuration et code Tauri pour packaging PC.
-- `src-tauri/app-icon.svg` : source de l'icone applicative.
+- `src-tauri/app-icon.png` : source de l'icone applicative.
 - `src-tauri/icons/` : icones generees pour le packaging Tauri.
+- `src/assets/settings/` : kit d'assets PNG 32-bit pour le panneau de
+  parametres.
+- `src/assets/cursor/` : curseurs PNG 32-bit utilises par l'interface.
 - `ITERATIONS VISUELLES/` : dossier local de references et iterations visuelles,
   ignore par Git. Les assets retenus doivent etre copies dans `src/assets/`.
 - `dist/` : sortie de build frontend, non versionnee.
@@ -112,15 +117,17 @@ Structure actuelle :
   arrive en fade-in, la musique demarre quelques secondes apres avec fade-in,
   le vent est relance avec delais/offsets aleatoires pour eviter une synchro
   fixe, et les sons UI hover/select ont des gains separes. Les parametres
-  exposent trois volumes : musique, ambiance et UI. Le mixage reste a valider a
+  exposent trois volumes : musique, ambiance et UI. Le mix par defaut met la
+  musique au-dessus de l'ambiance de fond. Le mixage reste a valider a
   l'oreille dans l'application installee.
 - Les boutons grises ne doivent pas declencher de son de hover.
 - Les assets visuels importants pourront etre crees separement par
   l'utilisateur via generation d'image, puis integres au projet quand leur role
   est clair. Ils doivent viser un rendu 32-bit/pixel art, pas des textures
   realistes lisses.
-- Une icone applicative provisoire existe pour debloquer le packaging Tauri.
-  Elle peut etre remplacee plus tard par un asset final plus travaille.
+- L'icone applicative actuelle utilise l'asset `ICONE OTHELLO ISLAND.png`
+  fourni par l'utilisateur, nettoye de ses metadonnees avant versionnement puis
+  regenere en formats Tauri.
 - Piste future a cadrer : ajouter une couche d'histoire ou de secret a
   debloquer, et faire evoluer l'ambiance pendant la partie via lumiere,
   textures et details de decor. Les textures importantes seront generees plus

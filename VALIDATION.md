@@ -692,3 +692,52 @@ Controles avant push :
   utilisateur ou metadonnee XMP residuelle detecte.
 - `ITERATIONS VISUELLES/`, `dist/` et `src-tauri/target/` restent ignores par
   Git.
+
+## 2026-05-19 - Kit parametres 32-bit, icone finale et mix musique
+
+Etat :
+
+- Repo local : panneau de parametres rhabille avec des assets `ASSETS/02`,
+  curseur custom ajoute, mix audio ajuste et icone applicative remplacee.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  avec succes.
+- Release publique : non publiee. Aucun artefact n'a encore ete publie comme
+  GitHub Release.
+- Validation reelle : validations automatisees effectuees. Retest manuel dans
+  l'application installee encore necessaire pour juger le rendu exact du panneau
+  de parametres, le nouveau curseur et le mix musique/ambiance a l'oreille.
+
+Changements effectues :
+
+- Musique remontee dans le mix par defaut ; ambiance ocean/vent reduite pour
+  rester en arriere-plan.
+- Integration selective du kit `ITERATIONS VISUELLES/ASSETS/02` :
+  panneau de parametres, titre, onglets, boutons de mode d'affichage, toggles,
+  sliders, icones de section et curseur 32-bit.
+- Remplacement de `src-tauri/app-icon.svg` par `src-tauri/app-icon.png`, issu de
+  `ICONE OTHELLO ISLAND.png`, puis regeneration des icones Tauri.
+- Nettoyage des metadonnees de provenance de l'icone source avant
+  versionnement.
+- Assets 02 inutilises retires de `src/assets/` avant commit pour eviter de
+  publier des exports bruts non exploites.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm run build` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `npm run tauri icon -- src-tauri/app-icon.png` : OK, icones regenerees.
+- `npm run tauri build` : OK, artefacts Windows regeneres.
+- Scan anti-leak/metadonnees sur les assets destines au depot : aucun token,
+  chemin utilisateur ou XMP residuel detecte dans les nouveaux assets
+  versionnes.
+- Verification navigateur automatique limitee : le serveur Vite local repond
+  en HTTP 200 sur `http://127.0.0.1:1420`, mais la capture headless n'a pas
+  produit de screenshot exploitable dans cette session.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.0_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.0_x64-setup.exe`

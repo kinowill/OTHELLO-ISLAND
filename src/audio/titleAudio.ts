@@ -25,17 +25,17 @@ const AUDIO_URLS: Record<AudioAsset, string> = {
 // Calibrated from ffmpeg volumedetect; source levels differ a lot.
 const BASE_AUDIO_GAINS: Record<AudioAsset | "master", number> = {
   master: 0.82,
-  ocean: 0.82,
-  wind: 0.28,
-  music: 0.08,
+  ocean: 0.76,
+  wind: 0.22,
+  music: 0.1,
   hover: 12,
   select: 0.55,
 };
 
 const DEFAULT_MIX: AudioMix = {
-  ambience: 0.86,
-  music: 0.72,
-  ui: 0.82,
+  ambience: 0.68,
+  music: 0.9,
+  ui: 0.78,
 };
 
 const AMBIENCE_FADE_IN_SECONDS = 5.2;
@@ -413,4 +413,3 @@ export class TitleAudioController {
     }
   }
 }
-

@@ -20,6 +20,7 @@
   --pixel-blue: #102947;
   --pixel-night: #06101b;
   --pixel-red: #a2372f;
+  --settings-glow: rgba(235, 182, 74, 0.34);
 }
 
 * {
@@ -31,10 +32,39 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
+  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto;
 }
 
 button {
   font: inherit;
+}
+
+button,
+label,
+input,
+[role="button"] {
+  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer;
+}
+
+button:active,
+input:active,
+label:active {
+  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer;
+}
+
+button:disabled {
+  cursor: url("./assets/cursor/cursor_idle.png") 10 6, default;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .app-shell {
@@ -1241,57 +1271,220 @@ button {
   place-items: center;
   padding: 24px;
   background:
+    radial-gradient(circle at 50% 18%, rgba(235, 182, 74, 0.12), transparent 30%),
     repeating-linear-gradient(rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px),
-    rgba(0, 0, 0, 0.72);
+    rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(2px);
 }
 
 .settings-panel {
-  width: min(92vw, 720px);
-  max-height: min(86vh, 820px);
-  overflow: auto;
-  border: 2px solid rgba(192, 164, 107, 0.42);
+  position: relative;
+  width: min(94vw, 780px);
+  max-height: min(91vh, 840px);
+  overflow: hidden;
+  padding: 92px 82px 62px;
+  border: 0;
   color: var(--wax);
-  background:
-    linear-gradient(180deg, rgba(17, 20, 22, 0.96), rgba(6, 8, 9, 0.98)),
-    #08090a;
+  background-image: url("./assets/settings/settings_background_panel_idle.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   box-shadow:
-    10px 10px 0 rgba(0, 0, 0, 0.5),
-    inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+    0 28px 90px rgba(0, 0, 0, 0.72),
+    0 0 54px rgba(235, 182, 74, 0.08);
+  image-rendering: pixelated;
+}
+
+.settings-panel::before,
+.settings-panel::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.settings-panel::before {
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  background-image: url("./assets/settings/settings_background_panel_glow.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  animation: settingsPanelPulse 4.6s steps(2) infinite;
+}
+
+.settings-panel::after {
+  inset: 88px 78px 54px;
+  z-index: 0;
+  opacity: 0.16;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(243, 234, 216, 0.08) 0,
+      rgba(243, 234, 216, 0.08) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: overlay;
 }
 
 .settings-header {
+  position: relative;
+  z-index: 1;
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  align-items: start;
-  padding: 22px;
-  border-bottom: 2px solid rgba(192, 164, 107, 0.2);
+  justify-content: center;
+  align-items: center;
+  min-height: 76px;
+  margin: -44px 8px 4px;
 }
 
-.settings-header h2 {
-  margin: 0;
-  font-size: clamp(1.7rem, 4vw, 2.6rem);
-  line-height: 0.9;
-  text-transform: uppercase;
+.settings-title-art {
+  width: min(100%, 530px);
+  aspect-ratio: 669 / 183;
+  background-image: url("./assets/settings/settings_title_parameters.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.34));
 }
 
-.icon-button {
-  min-width: 46px;
+.settings-close-button {
+  position: absolute;
+  top: 6px;
+  right: -42px;
+  width: 58px;
+  min-width: 58px;
+  min-height: 58px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  color: transparent;
+  background:
+    url("./assets/settings/settings_icon_back.png") center / contain no-repeat,
+    transparent;
+  box-shadow: none;
+  image-rendering: pixelated;
+}
+
+.settings-close-button:hover,
+.settings-close-button:focus-visible {
+  outline: none;
+  filter:
+    drop-shadow(0 0 12px rgba(235, 182, 74, 0.54))
+    brightness(1.12);
+}
+
+.settings-tabs {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0 2px;
+}
+
+.settings-tab {
   min-height: 42px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.25));
+}
+
+.settings-tab-display {
+  background-image: url("./assets/settings/settings_tab_display.png");
+}
+
+.settings-tab-audio {
+  background-image: url("./assets/settings/settings_tab_audio.png");
+}
+
+.settings-tab-gameplay {
+  background-image: url("./assets/settings/settings_tab_gameplay.png");
+}
+
+.settings-tab-controls {
+  background-image: url("./assets/settings/settings_tab_controls.png");
 }
 
 .settings-list {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 16px;
-  padding: 22px;
+  gap: 12px;
+  max-height: min(58vh, 520px);
+  padding: 2px 8px 10px;
+  overflow: auto;
+  scrollbar-color: rgba(235, 182, 74, 0.7) rgba(0, 0, 0, 0.3);
 }
 
 .settings-group {
+  position: relative;
   display: grid;
   gap: 12px;
-  padding: 16px;
-  border: 1px solid rgba(192, 164, 107, 0.24);
-  background: rgba(0, 0, 0, 0.24);
+  min-height: 126px;
+  padding: 24px 28px 22px;
+  border: 0;
+  background-image: url("./assets/settings/settings_section_panel_idle.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.24));
+}
+
+.settings-group::after,
+.asset-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: url("./assets/settings/settings_section_panel_glow.png") center / 100% 100% no-repeat;
+  animation: settingsSectionPulse 5.8s steps(2) infinite;
+}
+
+.settings-group > *,
+.asset-placeholder > * {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-group-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 28px;
+}
+
+.settings-icon {
+  width: 32px;
+  height: 34px;
+  flex: 0 0 auto;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.settings-icon-audio {
+  background-image: url("./assets/settings/settings_icon_audio.png");
+}
+
+.settings-icon-controls {
+  background-image: url("./assets/settings/settings_icon_controls.png");
+}
+
+.settings-icon-display {
+  background-image: url("./assets/settings/settings_icon_display.png");
+}
+
+.settings-icon-gameplay {
+  background-image: url("./assets/settings/settings_icon_gameplay.png");
+}
+
+.settings-icon-warning {
+  background-image: url("./assets/settings/settings_icon_warning.png");
 }
 
 .display-mode-grid {
@@ -1301,35 +1494,45 @@ button {
 }
 
 .setting-choice {
-  min-height: 44px;
-  padding: 8px 10px;
-  border: 1px solid rgba(192, 164, 107, 0.38);
+  min-height: 62px;
+  padding: 11px 16px 10px;
+  border: 0;
   color: var(--wax);
   cursor: pointer;
-  background: rgba(0, 0, 0, 0.34);
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.26);
-  font-size: 0.78rem;
+  background:
+    url("./assets/settings/settings_button_empty_medium_idle.png") center / 100% 100% no-repeat,
+    transparent;
+  box-shadow: none;
+  font-size: 0.62rem;
   font-weight: 900;
+  line-height: 1.08;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9);
   text-transform: uppercase;
+  image-rendering: pixelated;
 }
 
 .setting-choice:not(:disabled):hover,
 .setting-choice:not(:disabled):focus-visible {
-  border-color: rgba(243, 234, 216, 0.66);
   color: var(--brass);
   outline: none;
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+  filter: drop-shadow(0 0 12px rgba(235, 182, 74, 0.32));
+}
+
+.setting-choice:not(:disabled):active {
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_02.png");
 }
 
 .setting-choice:disabled {
-  color: var(--brass);
+  color: #f0c15c;
   cursor: default;
-  background: rgba(192, 164, 107, 0.16);
-  box-shadow: inset 0 0 0 1px rgba(243, 234, 216, 0.1);
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+  filter: brightness(1.05);
 }
 
 .volume-control {
   display: grid;
-  grid-template-columns: 94px 1fr 48px;
+  grid-template-columns: 92px 1fr 48px;
   gap: 12px;
   align-items: center;
   color: var(--ash);
@@ -1352,27 +1555,152 @@ button {
 
 .volume-control input {
   width: 100%;
-  accent-color: var(--brass);
+  height: 34px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+}
+
+.volume-control input:focus-visible {
+  outline: none;
+  filter: drop-shadow(0 0 10px rgba(235, 182, 74, 0.45));
+}
+
+.volume-control input::-webkit-slider-runnable-track {
+  height: 26px;
+  border: 0;
+  background:
+    linear-gradient(90deg, rgba(235, 182, 74, 0.72) 0 var(--volume-level), transparent var(--volume-level)),
+    url("./assets/settings/settings_slider_track_idle.png") center / 100% 26px no-repeat;
+}
+
+.volume-control input:hover::-webkit-slider-runnable-track,
+.volume-control input:focus-visible::-webkit-slider-runnable-track {
+  background:
+    linear-gradient(90deg, rgba(247, 204, 92, 0.88) 0 var(--volume-level), transparent var(--volume-level)),
+    url("./assets/settings/settings_slider_track_selected.png") center / 100% 26px no-repeat;
+}
+
+.volume-control input::-webkit-slider-thumb {
+  width: 34px;
+  height: 34px;
+  margin-top: -4px;
+  appearance: none;
+  border: 0;
+  background: url("./assets/settings/settings_slider_handle_idle.png") center / contain no-repeat;
+}
+
+.volume-control input:hover::-webkit-slider-thumb,
+.volume-control input:focus-visible::-webkit-slider-thumb {
+  background-image: url("./assets/settings/settings_slider_handle_selected_01.png");
+}
+
+.volume-control input:active::-webkit-slider-thumb {
+  background-image: url("./assets/settings/settings_slider_handle_selected_02.png");
+}
+
+.volume-control input::-moz-range-track {
+  height: 26px;
+  border: 0;
+  background:
+    linear-gradient(90deg, rgba(235, 182, 74, 0.72) 0 var(--volume-level), transparent var(--volume-level)),
+    url("./assets/settings/settings_slider_track_idle.png") center / 100% 26px no-repeat;
+}
+
+.volume-control input::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: url("./assets/settings/settings_slider_handle_idle.png") center / contain no-repeat;
 }
 
 .asset-placeholder {
-  padding: 16px;
-  border: 1px solid rgba(192, 164, 107, 0.24);
-  background: rgba(0, 0, 0, 0.28);
+  position: relative;
+  min-height: 112px;
+  padding: 24px 28px 22px;
+  border: 0;
+  background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.22));
 }
 
 .asset-placeholder strong {
   display: block;
-  margin-bottom: 8px;
+  margin: 2px 0 8px 40px;
   color: var(--wax);
   text-transform: uppercase;
 }
 
 .asset-placeholder p:last-child {
   margin: 0;
+  padding-left: 40px;
   color: var(--ash);
   font-family: "Trebuchet MS", Verdana, sans-serif;
   line-height: 1.5;
+}
+
+.option-toggle {
+  display: grid;
+  grid-template-columns: 136px 1fr;
+  min-height: 62px;
+  gap: 14px;
+  align-items: center;
+  color: var(--ash);
+  cursor: pointer;
+  font-family: "Courier New", "Lucida Console", monospace;
+  line-height: 1.35;
+}
+
+.option-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option-toggle span {
+  width: 136px;
+  height: 62px;
+  border: 0;
+  background: url("./assets/settings/settings_toggle_off_idle.png") center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+
+.option-toggle span::after {
+  display: none;
+}
+
+.option-toggle:hover span {
+  background-image: url("./assets/settings/settings_toggle_off_hover_01.png");
+}
+
+.option-toggle input:checked + span {
+  background: url("./assets/settings/settings_toggle_on_idle.png") center / 100% 100% no-repeat;
+}
+
+.option-toggle:hover input:checked + span {
+  background-image: url("./assets/settings/settings_toggle_on_hover_01.png");
+}
+
+.option-toggle input:focus-visible + span {
+  outline: none;
+  filter: drop-shadow(0 0 12px rgba(235, 182, 74, 0.56));
+}
+
+.option-toggle input:active + span {
+  background-image: url("./assets/settings/settings_toggle_off_selected.png");
+}
+
+.option-toggle input:checked:active + span {
+  background-image: url("./assets/settings/settings_toggle_on_selected.png");
+}
+
+.option-toggle em {
+  color: var(--wax);
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1.16;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
 }
 
 .game-stage {
@@ -1634,63 +1962,6 @@ h1 {
 .options-block {
   display: grid;
   gap: 8px;
-}
-
-.option-toggle {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 12px;
-  align-items: center;
-  color: var(--ash);
-  cursor: pointer;
-  font-family: "Trebuchet MS", Verdana, sans-serif;
-  font-size: 0.9rem;
-  line-height: 1.35;
-}
-
-.option-toggle input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.option-toggle span {
-  position: relative;
-  width: 48px;
-  height: 26px;
-  border: 1px solid rgba(192, 164, 107, 0.36);
-  background: rgba(0, 0, 0, 0.24);
-}
-
-.option-toggle span::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 16px;
-  height: 16px;
-  background: var(--ash);
-  transition:
-    transform 140ms ease,
-    background 140ms ease;
-}
-
-.option-toggle input:checked + span {
-  background: rgba(192, 164, 107, 0.2);
-}
-
-.option-toggle input:checked + span::after {
-  background: var(--brass);
-  transform: translateX(22px);
-}
-
-.option-toggle input:focus-visible + span {
-  outline: 2px solid rgba(192, 164, 107, 0.56);
-  outline-offset: 3px;
-}
-
-.option-toggle em {
-  font-style: normal;
 }
 
 .board-frame {
@@ -1956,6 +2227,30 @@ h1 {
   79%,
   86% {
     opacity: 1;
+  }
+}
+
+@keyframes settingsPanelPulse {
+  0%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+  61%,
+  72% {
+    opacity: 0.58;
+  }
+}
+
+@keyframes settingsSectionPulse {
+  0%,
+  68%,
+  100% {
+    opacity: 0;
+  }
+  69%,
+  78% {
+    opacity: 0.34;
   }
 }
 
