@@ -3,7 +3,8 @@ dist/
 dist-ssr/
 target/
 src-tauri/target/
+src-tauri/gen/
 .vite/
 *.log
 *.local
-
+ITERATIONS VISUELLES/

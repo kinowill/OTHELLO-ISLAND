@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Othello Island icon">
+  <defs>
+    <radialGradient id="bg" cx="36%" cy="28%" r="76%">
+      <stop offset="0" stop-color="#2f3b33"/>
+      <stop offset="0.52" stop-color="#101414"/>
+      <stop offset="1" stop-color="#050606"/>
+    </radialGradient>
+    <linearGradient id="brass" x1="170" y1="126" x2="866" y2="900">
+      <stop offset="0" stop-color="#f2d991"/>
+      <stop offset="0.48" stop-color="#b99a58"/>
+      <stop offset="1" stop-color="#70542b"/>
+    </linearGradient>
+    <radialGradient id="darkDisc" cx="34%" cy="28%" r="70%">
+      <stop offset="0" stop-color="#6a6a62"/>
+      <stop offset="0.46" stop-color="#17191a"/>
+      <stop offset="1" stop-color="#010101"/>
+    </radialGradient>
+    <radialGradient id="lightDisc" cx="32%" cy="24%" r="70%">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.56" stop-color="#d9ccb0"/>
+      <stop offset="1" stop-color="#8d7852"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="180" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="386" fill="none" stroke="url(#brass)" stroke-width="24" opacity="0.82"/>
+  <circle cx="512" cy="512" r="302" fill="none" stroke="#c0a46b" stroke-width="6" opacity="0.28"/>
+  <path d="M512 104l48 360 360 48-360 48-48 360-48-360-360-48 360-48z" fill="#c0a46b" opacity="0.16"/>
+
+  <g transform="translate(262 262)">
+    <rect x="0" y="0" width="500" height="500" rx="44" fill="#253126" stroke="url(#brass)" stroke-width="18"/>
+    <path d="M62.5 0v500M125 0v500M187.5 0v500M250 0v500M312.5 0v500M375 0v500M437.5 0v500M0 62.5h500M0 125h500M0 187.5h500M0 250h500M0 312.5h500M0 375h500M0 437.5h500" stroke="#08090a" stroke-width="5" opacity="0.58"/>
+    <path d="M0 0l500 500M500 0L0 500" stroke="#c0a46b" stroke-width="4" opacity="0.16"/>
+    <circle cx="219" cy="219" r="50" fill="url(#lightDisc)"/>
+    <circle cx="281" cy="219" r="50" fill="url(#darkDisc)"/>
+    <circle cx="219" cy="281" r="50" fill="url(#darkDisc)"/>
+    <circle cx="281" cy="281" r="50" fill="url(#lightDisc)"/>
+    <path d="M250 120l44 76h-88z" fill="#c0a46b" opacity="0.34"/>
+    <circle cx="250" cy="250" r="170" fill="none" stroke="#f3ead8" stroke-width="4" opacity="0.13"/>
+  </g>
+</svg>

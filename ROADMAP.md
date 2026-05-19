@@ -2,8 +2,8 @@
 
 ## Objectif courant
 
-Cadrer le projet avant implementation : stack, gameplay attendu, direction
-artistique, audio et mode de distribution PC.
+Stabiliser le prototype PC local : gameplay Othello jouable, packaging Windows,
+identite visuelle, audio et premiere experience installee.
 
 ## A faire maintenant
 
@@ -13,13 +13,41 @@ artistique, audio et mode de distribution PC.
 - [x] Definir la direction visuelle de base.
 - [ ] Produire une mini bible artistique : couleurs, formes, symboles, ambiance.
 - [x] Definir la strategie initiale d'assets visuels.
-- [ ] Definir la strategie audio et les contraintes d'assets musicaux.
+- [x] Definir la strategie audio initiale et les contraintes d'assets musicaux.
 - [x] Creer le scaffold React/Tauri.
 - [x] Implementer le premier prototype jouable humain contre humain.
 - [x] Valider les regles par tests unitaires.
 - [x] Valider le build frontend.
-- [ ] Valider le packaging Tauri desktop sur une machine avec ressources
-  systeme suffisantes.
+- [x] Valider le packaging Tauri desktop local.
+- [x] Tester manuellement l'application installee depuis l'installateur Windows.
+- [x] Masquer les coups possibles par defaut et ajouter une option pour les
+  afficher.
+- [x] Creer un premier ecran d'accueil anime retro PC CD-ROM.
+- [x] Reprendre l'accueil en scene nocturne wireframe : ile au loin, ocean,
+  nuages, vent et fenetre suspecte.
+- [x] Integrer les assets PNG 32-bit de l'ecran d'accueil : fond, logo, panneau
+  menu, boutons et footer.
+- [x] Verrouiller provisoirement la fenetre desktop en `1600x900` pour
+  stabiliser le cadrage de l'accueil.
+- [x] Remplacer les reglages inline par un vrai panneau de parametres.
+- [x] Ajouter un retour menu depuis une partie.
+- [x] Retirer l'ambiance audio procedurale jugee mauvaise.
+- [x] Integrer les premiers assets audio : ocean, musique menu, vent aleatoire,
+  hover et select UI.
+- [x] Ajouter les reglages de volume musique, ambiance et UI dans les
+  parametres.
+- [x] Ajouter les modes d'affichage : plein ecran fenetre sans bordure, vrai
+  plein ecran et fenetre fixe `1600x900`.
+- [x] Lancer l'ambiance en fade-in et retarder la musique au demarrage.
+- [x] Eviter le son de hover sur les boutons grises.
+- [ ] Retester l'installateur Windows apres ecran d'accueil, parametres, retour
+  menu, correction de taille de fenetre et option de coups possibles.
+- [ ] Cadrer les options completes.
+- [x] Choisir ou fournir des assets audio ocean / ambient mysterieuse.
+- [ ] Cadrer la couche histoire / secret a debloquer.
+- [ ] Cadrer les textures evolutives et changements d'ambiance pendant la
+  partie.
+- [ ] Definir la liste prioritaire de textures 32-bit a generer et integrer.
 
 ## Prototype jouable vise
 
@@ -37,18 +65,32 @@ artistique, audio et mode de distribution PC.
 2. Implementation du moteur de regles Othello.
 3. Creation d'une interface jouable minimale.
 4. Ajout d'une IA locale.
-5. Travail graphique et animations autour d'une ile mystique premium avec
-   symbolique occulte/esoterique fictionnelle.
-6. Integration audio.
-7. Packaging Windows.
+5. Travail graphique et animations autour d'une direction retro 32-bit / PC
+   CD-ROM sombre avec symbolique fictionnelle.
+6. Cadrage d'une couche histoire / secret a debloquer.
+7. Textures et ambiance evolutives selon l'avancee de la partie.
+8. Integration audio.
+9. Packaging Windows.
 
 ## Bloque ou a arbitrer
 
 - Bible artistique detaillee non creee.
 - Niveau d'IA attendu non choisi.
 - Type de musiques et droits d'utilisation non clarifies.
-- Packaging Tauri desktop bloque localement par une erreur Windows de
-  memoire/fichier de pagination pendant la compilation Rust complete.
+- Premiers assets audio fournis et integres. Mixage final et sliders de volume
+  a retester a l'oreille dans l'application installee.
+- Forme exacte de l'histoire / secret a debloquer non definie.
+- Systeme d'evolution visuelle en partie a definir : lumiere, textures,
+  details de decor, et conditions de changement.
+- Assets d'accueil 32-bit integres. Les autres textures de jeu restent a
+  definir et integrer.
+- Mode responsive/letterbox non implemente : la version courante privilegie une
+  base `1600x900` avec mode plein ecran fenetre sans bordure par defaut,
+  plus options vrai plein ecran et fenetre fixe. Ces modes sont a retester dans
+  l'application installee.
+- Aucun blocage packaging connu apres correction Windows et ajout des icones.
+- Release publique non publiee : les artefacts existent localement, mais ne
+  sont pas encore livres via GitHub Release ou autre canal.
 
 ## Stack retenue
 
@@ -65,10 +107,19 @@ artistique, audio et mode de distribution PC.
 - Les assets generes par image IA seront demandes plus tard avec des briefs
   precis : fond principal, textures de plateau, icones/sceaux, pions,
   eventuellement jaquette ou splash screen.
+- Les textures doivent etre generees dans un style retro 32-bit / pixel art
+  propre. Eviter les textures photo lisses ou trop modernes.
+- Les iterations et exports bruts restent dans `ITERATIONS VISUELLES/` et ne
+  sont pas versionnes. Les assets retenus sont copies dans `src/assets/`.
+- Les futures textures peuvent devenir evolutives pendant la partie : lumiere
+  qui baisse, signes qui apparaissent, decor qui se charge de details, ou autre
+  progression visuelle a definir.
 
 ## Direction artistique retenue
 
-Base : ile/fantasy stylisee, sobre, premium, mystique.
+Base : retro 32-bit / pixel art propre, jaquette PC CD-ROM sombre, ile
+mysterieuse, table d'enquete, mer nocturne et dossiers confidentiels
+fictionnels.
 
 References visuelles autorisees :
 
