@@ -671,3 +671,24 @@ Artefacts generes :
 - `src-tauri/target/release/othello-island.exe`
 - `src-tauri/target/release/bundle/msi/Othello Island_0.1.0_x64_en-US.msi`
 - `src-tauri/target/release/bundle/nsis/Othello Island_0.1.0_x64-setup.exe`
+
+## 2026-05-19 - Push GitHub assets et controles
+
+Etat :
+
+- Repo local : commit `12b5c2f` cree sur `main`.
+- GitHub : commit `12b5c2f` pousse sur `origin/main`.
+- Distribution locale : installateur Windows regenere avant le push.
+- Release publique : non publiee. Le code source et les assets sont publics sur
+  GitHub, mais aucun installateur n'a ete publie comme GitHub Release.
+- Validation reelle : validations automatisees effectuees avant commit. Retest
+  manuel de l'installateur, du mixage audio et des modes d'affichage encore a
+  faire.
+
+Controles avant push :
+
+- `git diff --check` : OK.
+- Scan anti-leak sur code et assets publics : aucun token, cle API, chemin
+  utilisateur ou metadonnee XMP residuelle detecte.
+- `ITERATIONS VISUELLES/`, `dist/` et `src-tauri/target/` restent ignores par
+  Git.
