@@ -2195,6 +2195,46 @@ h1 {
   outline-offset: 3px;
 }
 
+body,
+.app-shell {
+  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto;
+}
+
+button:not(:disabled),
+label,
+input,
+[role="button"],
+.title-action:not(:disabled),
+.setting-choice:not(:disabled),
+.option-toggle,
+.cell.playable,
+.reset-button {
+  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+}
+
+button:not(:disabled):active,
+label:active,
+input:active,
+.title-action:not(:disabled):active,
+.setting-choice:not(:disabled):active,
+.option-toggle:active,
+.cell.playable:active,
+.reset-button:active {
+  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer !important;
+}
+
+button:disabled,
+.title-action:disabled,
+.setting-choice:disabled,
+.cell,
+.cell:disabled {
+  cursor: url("./assets/cursor/cursor_idle.png") 10 6, default !important;
+}
+
+.cell.playable {
+  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+}
+
 @keyframes placeDisc {
   from {
     opacity: 0.2;

@@ -754,3 +754,32 @@ Etat :
 - Validation reelle : validations automatisees effectuees avant commit. Retest
   manuel de l'installateur, du nouveau panneau de parametres, du curseur, de
   l'icone installee et du mix audio encore a faire.
+
+## 2026-05-19 - Correction curseur custom sur boutons
+
+Etat :
+
+- Repo local : CSS corrige pour conserver le curseur custom au survol et au
+  clic des boutons, controles et cases jouables.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  avec succes apres correction.
+- Release publique : non publiee. Aucun artefact n'a encore ete publie comme
+  GitHub Release.
+- Validation reelle : validations automatisees effectuees. Retest manuel dans
+  l'application installee encore necessaire pour verifier visuellement que le
+  curseur Windows ne reapparait plus au survol des boutons.
+
+Cause :
+
+- Les curseurs custom etaient declares en haut de `src/App.css`, mais des
+  regles plus basses comme `cursor: pointer` et `cursor: default` reprenaient
+  la main sur les boutons et certains controles.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `git diff --check` : OK.
+- `npm run tauri build` : OK, artefacts Windows regeneres.
