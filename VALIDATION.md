@@ -1201,3 +1201,21 @@ Artefacts generes :
 - `src-tauri/target/release/othello-island.exe`
 - `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
 - `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`
+
+## 2026-05-20 - Push GitHub choix de mode accueil
+
+Etat :
+
+- Repo local : commit `4532815` cree sur `main`.
+- GitHub : commit `4532815` pousse sur `origin/main`.
+- Distribution locale : executable Windows, MSI et installateur NSIS `0.1.5`
+  regeneres avant push.
+- Release publique : non publiee. Le code source est pousse, mais aucun
+  installateur n'a ete publie comme GitHub Release.
+- Validation reelle : validations automatisees et verification visuelle
+  Chrome headless effectuees avant push. Validation manuelle de l'installateur
+  et du rendu exact sur l'application installee encore a faire.
+
+Commit pousse :
+
+- `4532815 feat: add title mode selection`
