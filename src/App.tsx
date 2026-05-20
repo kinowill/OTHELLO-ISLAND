@@ -21,15 +21,15 @@ type Screen = "menu" | "game";
 type DisplayMode = "borderless" | "fullscreen" | "windowed";
 
 const DEFAULT_AUDIO_MIX: AudioMix = {
-  ambience: 0.68,
+  ambience: 0.6,
   music: 0.9,
   ui: 0.78,
 };
 
 const displayModeLabels: Record<DisplayMode, string> = {
-  borderless: "Plein ecran fenetre",
-  fullscreen: "Vrai plein ecran",
-  windowed: "Fenetre 1600x900",
+  borderless: "Sans bordure",
+  fullscreen: "Plein ecran",
+  windowed: "Fenetre fixe",
 };
 
 const playerLabels: Record<Player, string> = {
@@ -48,6 +48,7 @@ const applyDisplayMode = async (mode: DisplayMode) => {
       getCurrentWindow,
     } = await import("@tauri-apps/api/window");
     const appWindow = getCurrentWindow();
+    await appWindow.setCursorVisible(true);
 
     if (mode === "fullscreen") {
       await appWindow.setSizeConstraints(null);
@@ -277,7 +278,7 @@ function App() {
           <div className="settings-group settings-group-gameplay">
             <div className="settings-group-title">
               <span className="settings-icon settings-icon-gameplay" aria-hidden="true" />
-              <p className="panel-kicker">Gameplay</p>
+              <p className="panel-kicker">Options</p>
             </div>
 
             <label className="option-toggle">
@@ -290,7 +291,7 @@ function App() {
                 type="checkbox"
               />
               <span aria-hidden="true" />
-              <em>Ambiance sonore</em>
+              <em>Audio du menu</em>
             </label>
 
             <label className="option-toggle">
@@ -303,25 +304,13 @@ function App() {
                 type="checkbox"
               />
               <span aria-hidden="true" />
-              <em>Afficher les coups possibles</em>
+              <em>Afficher les coups</em>
             </label>
-          </div>
-
-          <div className="asset-placeholder asset-placeholder-audio">
-            <div className="settings-group-title">
-              <span className="settings-icon settings-icon-audio" aria-hidden="true" />
-              <p className="panel-kicker">Audio</p>
-            </div>
-            <strong>{audioEnabled ? "Ambiance active" : "Ambiance coupee"}</strong>
-            <p>
-              Musique legerement devant le decor sonore. Ocean en fondue, vent
-              aleatoire, depart musical retarde.
-            </p>
           </div>
 
           <div className="settings-group settings-group-audio">
             <div className="settings-group-title">
-              <span className="settings-icon settings-icon-controls" aria-hidden="true" />
+              <span className="settings-icon settings-icon-audio" aria-hidden="true" />
               <p className="panel-kicker">Mixage</p>
             </div>
             <label className="volume-control" style={volumeStyle(audioMix.music)}>
@@ -362,17 +351,6 @@ function App() {
             </label>
           </div>
 
-          <div className="asset-placeholder asset-placeholder-warning">
-            <div className="settings-group-title">
-              <span className="settings-icon settings-icon-warning" aria-hidden="true" />
-              <p className="panel-kicker">Textures</p>
-            </div>
-            <strong>Non integrees</strong>
-            <p>
-              Les textures definitives seront generees en 32-bit puis ajoutees
-              comme assets locaux.
-            </p>
-          </div>
         </div>
       </section>
     </div>

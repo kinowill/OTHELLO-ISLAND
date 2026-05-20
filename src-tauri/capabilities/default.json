@@ -3,6 +3,19 @@
   "identifier": "default",
   "description": "Default permissions for Othello Island",
   "windows": ["main"],
-  "permissions": ["opener:default"]
+  "permissions": [
+    "opener:default",
+    "core:window:allow-center",
+    "core:window:allow-close",
+    "core:window:allow-current-monitor",
+    "core:window:allow-maximize",
+    "core:window:allow-set-decorations",
+    "core:window:allow-set-cursor-visible",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-set-size-constraints",
+    "core:window:allow-unmaximize"
+  ]
 }
-

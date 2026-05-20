@@ -26,11 +26,18 @@ public signe. Il reste un projet personnel.
   ecran fenetre sans bordure applique au lancement.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
   ambiance sonore, coups possibles, mixage separe musique / ambiance / UI,
-  curseur custom et lueurs de panneau.
+  lueurs de panneau.
 - Audio procedural retire apres test utilisateur negatif. Premiere integration
   audio par assets locaux : ocean nocturne, musique menu retardee avec fade-in,
   vent aleatoire, hover et select UI. Le mix par defaut place maintenant la
-  musique legerement devant l'ambiance.
+  musique a 90% et l'ambiance a 60%.
+- Correctif options du 2026-05-20 : permissions Tauri ajoutees pour les modes
+  d'affichage, version installable passee a `0.1.5`, footer image restaure,
+  curseur 32-bit personnalise restaure, textes internes du panneau options
+  retires et icone audio utilisee pour le bloc Mixage.
+- Les deux backgrounds du panneau settings (`idle` et `glow`) ont ete
+  reintegres depuis les exports modifies de l'utilisateur le 2026-05-20, puis
+  les artefacts Windows `0.1.5` ont ete regeneres.
 - Le depot GitHub de reference est `https://github.com/kinowill/OTHELLO-ISLAND`.
 - Direction artistique canonique : retro 32-bit / pixel art propre, ambiance
   PC CD-ROM sombre, ile mysterieuse, dossiers confidentiels fictionnels.
@@ -67,7 +74,8 @@ Structure actuelle :
 - `src-tauri/icons/` : icones generees pour le packaging Tauri.
 - `src/assets/settings/` : kit d'assets PNG 32-bit pour le panneau de
   parametres.
-- `src/assets/cursor/` : curseurs PNG 32-bit utilises par l'interface.
+- `src/assets/cursor/` : curseurs PNG 32-bit actifs pour l'etat normal, le
+  survol et le clic.
 - `ITERATIONS VISUELLES/` : dossier local de references et iterations visuelles,
   ignore par Git. Les assets retenus doivent etre copies dans `src/assets/`.
 - `dist/` : sortie de build frontend, non versionnee.
@@ -98,6 +106,9 @@ Structure actuelle :
   proposent aussi un vrai plein ecran et un retour en fenetre fixe `1600x900`.
   Un mode scale/letterbox pourra remplacer cette contrainte plus tard si le
   support de petits ecrans devient prioritaire.
+- Les appels Tauri de gestion de fenetre doivent etre autorises dans
+  `src-tauri/capabilities/default.json`. Sans ces permissions, les boutons de
+  mode d'affichage peuvent ne rien changer dans l'application desktop.
 - Les codes de societes secretes, d'elite cachee et de theories de complot
   peuvent nourrir l'ambiance, mais doivent rester fictionnels et non accusatoires.
 - Le traitement artistique doit rester subtil, elegant et cryptique : symboles
@@ -118,8 +129,8 @@ Structure actuelle :
   le vent est relance avec delais/offsets aleatoires pour eviter une synchro
   fixe, et les sons UI hover/select ont des gains separes. Les parametres
   exposent trois volumes : musique, ambiance et UI. Le mix par defaut met la
-  musique au-dessus de l'ambiance de fond. Le mixage reste a valider a
-  l'oreille dans l'application installee.
+  musique a 90% et l'ambiance a 60%. Le mixage reste a valider a l'oreille
+  dans l'application installee.
 - Les boutons grises ne doivent pas declencher de son de hover.
 - Les assets visuels importants pourront etre crees separement par
   l'utilisateur via generation d'image, puis integres au projet quand leur role
@@ -127,7 +138,12 @@ Structure actuelle :
   realistes lisses.
 - L'icone applicative actuelle utilise l'asset `ICONE OTHELLO ISLAND.png`
   fourni par l'utilisateur, nettoye de ses metadonnees avant versionnement puis
-  regenere en formats Tauri.
+  regenere en formats Tauri. La version installable a ete incrementee en
+  `0.1.5`. Le hook NSIS copie maintenant un fichier
+  `othello-island-icon-0.1.5.ico` dans le dossier d'installation et le
+  raccourci bureau pointe son `IconLocation` vers ce fichier versionne, afin
+  d'eviter que le cache Explorer reutilise l'ancienne icone liee a
+  `othello-island.exe,0`.
 - Piste future a cadrer : ajouter une couche d'histoire ou de secret a
   debloquer, et faire evoluer l'ambiance pendant la partie via lumiere,
   textures et details de decor. Les textures importantes seront generees plus

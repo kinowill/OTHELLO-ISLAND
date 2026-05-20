@@ -32,6 +32,13 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+html,
+body,
+#root,
+.app-shell,
+.asset-title-screen {
   cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto;
 }
 
@@ -1279,10 +1286,10 @@ button:disabled {
 
 .settings-panel {
   position: relative;
-  width: min(94vw, 780px);
+  width: min(95vw, 840px);
   max-height: min(91vh, 840px);
   overflow: hidden;
-  padding: 92px 82px 62px;
+  padding: 92px 78px 62px;
   border: 0;
   color: var(--wax);
   background-image: url("./assets/settings/settings_background_panel_idle.png");
@@ -1413,7 +1420,7 @@ button:disabled {
   z-index: 1;
   display: grid;
   gap: 12px;
-  max-height: min(58vh, 520px);
+  max-height: min(59vh, 530px);
   padding: 2px 8px 10px;
   overflow: auto;
   scrollbar-color: rgba(235, 182, 74, 0.7) rgba(0, 0, 0, 0.3);
@@ -1423,8 +1430,8 @@ button:disabled {
   position: relative;
   display: grid;
   gap: 12px;
-  min-height: 126px;
-  padding: 24px 28px 22px;
+  min-height: 130px;
+  padding: 24px 30px 22px;
   border: 0;
   background-image: url("./assets/settings/settings_section_panel_idle.png");
   background-position: center;
@@ -1453,14 +1460,14 @@ button:disabled {
 
 .settings-group-title {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
-  min-height: 28px;
+  min-height: 44px;
 }
 
 .settings-icon {
-  width: 32px;
-  height: 34px;
+  width: 48px;
+  height: 52px;
   flex: 0 0 auto;
   background-position: center;
   background-repeat: no-repeat;
@@ -1494,8 +1501,8 @@ button:disabled {
 }
 
 .setting-choice {
-  min-height: 62px;
-  padding: 11px 16px 10px;
+  min-height: 66px;
+  padding: 12px 16px 10px;
   border: 0;
   color: var(--wax);
   cursor: pointer;
@@ -1503,7 +1510,7 @@ button:disabled {
     url("./assets/settings/settings_button_empty_medium_idle.png") center / 100% 100% no-repeat,
     transparent;
   box-shadow: none;
-  font-size: 0.62rem;
+  font-size: 0.82rem;
   font-weight: 900;
   line-height: 1.08;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.9);
@@ -1532,7 +1539,7 @@ button:disabled {
 
 .volume-control {
   display: grid;
-  grid-template-columns: 92px 1fr 48px;
+  grid-template-columns: 108px 1fr 54px;
   gap: 12px;
   align-items: center;
   color: var(--ash);
@@ -1544,7 +1551,7 @@ button:disabled {
 .volume-control strong {
   color: var(--wax);
   font-family: "Courier New", "Lucida Console", monospace;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -1616,7 +1623,7 @@ button:disabled {
 
 .asset-placeholder {
   position: relative;
-  min-height: 112px;
+  min-height: 118px;
   padding: 24px 28px 22px;
   border: 0;
   background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
@@ -1625,14 +1632,14 @@ button:disabled {
 
 .asset-placeholder strong {
   display: block;
-  margin: 2px 0 8px 40px;
+  margin: 2px 0 8px 60px;
   color: var(--wax);
   text-transform: uppercase;
 }
 
 .asset-placeholder p:last-child {
   margin: 0;
-  padding-left: 40px;
+  padding-left: 60px;
   color: var(--ash);
   font-family: "Trebuchet MS", Verdana, sans-serif;
   line-height: 1.5;
@@ -1695,7 +1702,7 @@ button:disabled {
 
 .option-toggle em {
   color: var(--wax);
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   font-style: normal;
   font-weight: 900;
   line-height: 1.16;
@@ -2195,9 +2202,12 @@ h1 {
   outline-offset: 3px;
 }
 
+html,
 body,
-.app-shell {
-  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto;
+#root,
+.app-shell,
+.asset-title-screen {
+  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto !important;
 }
 
 button:not(:disabled),

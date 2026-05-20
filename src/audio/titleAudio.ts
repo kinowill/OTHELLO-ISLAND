@@ -33,7 +33,7 @@ const BASE_AUDIO_GAINS: Record<AudioAsset | "master", number> = {
 };
 
 const DEFAULT_MIX: AudioMix = {
-  ambience: 0.68,
+  ambience: 0.6,
   music: 0.9,
   ui: 0.78,
 };

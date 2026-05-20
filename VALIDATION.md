@@ -795,3 +795,330 @@ Etat :
   installateur n'a ete publie comme GitHub Release.
 - Validation reelle : validations automatisees effectuees avant commit. Retest
   manuel du curseur dans l'application installee encore a faire a la reprise.
+
+## 2026-05-20 - Correctifs options, affichage et packaging 0.1.1
+
+Etat :
+
+- Repo local : options et configuration desktop corrigees, non committees.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.1`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees. Validation manuelle
+  dans l'application installee encore necessaire pour confirmer les modes
+  d'affichage, l'icone du raccourci desktop et le rendu exact du panneau options
+  sur l'ecran cible.
+
+Causes identifiees :
+
+- Les boutons de mode d'affichage appelaient les API Tauri de fenetre, mais la
+  capability desktop n'autorisait pas les commandes `set_fullscreen`,
+  `set_size`, `set_position`, `set_decorations` et commandes associees.
+- Le mix par defaut utilisait encore `ambience: 0.68` au lieu des 60% demandes.
+- Le panneau options contenait un texte de commentaire interne :
+  `Musique legerement devant le decor sonore...`.
+- Le footer d'accueil etait un PNG affichant `Othello Island v1.0 2025`.
+- Le curseur personnalise etait encore reference par le CSS.
+- L'icone desktop pouvait rester ancienne si Windows gardait le raccourci ou le
+  cache d'icone d'un installateur au meme numero de version.
+
+Changements effectues :
+
+- Ajout des permissions Tauri de fenetre dans
+  `src-tauri/capabilities/default.json`.
+- Version projet et bundle passee de `0.1.0` a `0.1.1`.
+- Volumes par defaut : musique 90%, ambiance 60%, UI inchangee.
+- Libelles des modes d'affichage raccourcis et agrandis.
+- Icones de section et textes du panneau options agrandis.
+- Texte audio interne remplace par un libelle utilisateur sobre.
+- Bloc developpement `Textures / Non integrees` retire du panneau options.
+- Footer `Othello Island v1.0 2025` retire de l'accueil.
+- References CSS au curseur personnalise supprimees. Les PNG de curseur restent
+  conserves dans `src/assets/cursor/`, mais ne sont plus utilises.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `npm run tauri build` : OK, artefacts Windows `0.1.1` generes.
+- `git diff --check` : OK.
+- Scan statique sur `src`, `dist` et config Tauri : aucune reference restante a
+  `assets/cursor`, `asset-title-footer`, `Othello Island v1.0 2025`,
+  `Musique legerement...`, `Ocean en fondue`, `Textures / Non integrees`, ni
+  aux anciens libelles longs des modes d'affichage.
+
+Limite de validation :
+
+- Verification visuelle navigateur automatique non effectuee : le plugin Browser
+  etait disponible, mais l'outil de pilotage necessaire n'etait pas expose dans
+  cette session.
+- Verification manuelle de l'application installee non effectuee dans cette
+  session.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.1_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.1_x64-setup.exe`
+
+## 2026-05-20 - Reintegrations backgrounds settings panel
+
+Etat :
+
+- Repo local : les deux assets settings panel modifies par l'utilisateur ont
+  remplace les versions integrees dans `src/assets/settings/`.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.1` avec ces assets.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees. Validation visuelle
+  manuelle dans l'application installee encore necessaire.
+
+Assets remplaces :
+
+- `src/assets/settings/settings_background_panel_idle.png`
+- `src/assets/settings/settings_background_panel_glow.png`
+
+Sources utilisees :
+
+- `ITERATIONS VISUELLES/ASSETS/02/settings/settings_background_panel_idle.png`
+- `ITERATIONS VISUELLES/ASSETS/02/settings/settings_background_panel_glow.png`
+
+Hashes SHA-256 apres integration :
+
+- `settings_background_panel_idle.png` :
+  `4CEE2719D66874ECABB8E5E1E7389B4EA2C83FDF04F59953D87D120E3055BBAF`
+- `settings_background_panel_glow.png` :
+  `2CE7D9F68E9A903C296D568371E672DAD2913153D89D12C2206218DE8C6591B1`
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK, les deux nouveaux assets sont presents dans `dist`.
+- `npm run tauri build` : OK, artefacts Windows `0.1.1` regeneres.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.1_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.1_x64-setup.exe`
+
+## 2026-05-20 - Retours UI et raccourci desktop 0.1.2
+
+Etat :
+
+- Repo local : corrections UI et packaging ajoutees, non committees.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.2`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees. Validation manuelle
+  dans l'application installee encore necessaire pour confirmer le curseur, le
+  footer, le panneau options et l'icone du raccourci bureau.
+
+Causes / constats :
+
+- Le footer avait ete retire entierement alors que l'utilisateur voulait le
+  conserver.
+- Le CSS ne declarait plus de curseur sur la racine apres suppression du
+  curseur custom ; l'application force maintenant le curseur systeme visible
+  cote CSS et via `setCursorVisible(true)` dans Tauri.
+- Le texte `Musique, ocean et vent sont regles dans le mixage.` etait encore
+  trop descriptif pour un menu de jeu.
+- Le bloc Mixage utilisait l'icone controles au lieu de l'icone audio.
+- Le script NSIS cree le raccourci bureau vers l'executable, mais un raccourci
+  deja existant peut conserver l'ancienne icone Windows. Un hook post-install
+  recree maintenant ce raccourci s'il existe.
+
+Changements effectues :
+
+- Footer d'accueil restaure avec `ui_title_footer_idle.png` et son shimmer.
+- Texte audio superflu retire du panneau options.
+- Bloc `Audio / Sons actifs` retire ; le statut reste porte par le toggle
+  `Audio du menu`.
+- Bloc Mixage passe sur l'icone audio.
+- Curseur systeme force sur `html`, `body`, `#root`, `.app-shell` et
+  `.asset-title-screen`.
+- Permission Tauri `core:window:allow-set-cursor-visible` ajoutee.
+- Version projet et bundle passee de `0.1.1` a `0.1.2`.
+- Hook NSIS `src-tauri/windows/nsis-hooks.nsh` ajoute pour supprimer/recreer le
+  raccourci bureau existant avec l'icone de `othello-island.exe`.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK, footer et nouveaux assets presents dans `dist`.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `npm run tauri build` : OK, artefacts Windows `0.1.2` generes.
+- Verification du script NSIS genere : inclusion de
+  `src-tauri/windows/nsis-hooks.nsh` et insertion de `NSIS_HOOK_POSTINSTALL`
+  confirmees.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.2_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.2_x64-setup.exe`
+
+## 2026-05-20 - Restauration curseur custom et packaging 0.1.3
+
+Etat :
+
+- Repo local : curseur personnalise restaure dans le CSS, versions projet
+  passees en `0.1.3`, documentation projet mise a jour, non committe.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.3`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees. Validation manuelle
+  dans l'application installee encore necessaire pour confirmer visuellement le
+  curseur personnalise, les modes d'affichage, le panneau options et l'icone du
+  raccourci bureau.
+
+Cause :
+
+- La demande precedente de retrait du curseur personnalise avait conduit a
+  forcer le curseur systeme dans `src/App.css`.
+- Les assets PNG de curseur existaient toujours dans `src/assets/cursor/`, mais
+  l'interface packagerisee ne les utilisait plus.
+- Des regles plus basses comme `cursor: pointer` et `cursor: default` peuvent
+  reprendre la main si les curseurs custom ne sont pas reappliques en fin de
+  CSS.
+
+Changements effectues :
+
+- Restauration de `cursor_idle.png`, `cursor_hover.png` et
+  `cursor_pressed.png` sur la racine, les boutons, les labels, les inputs, les
+  controles de parametres, les cases jouables et les etats disabled.
+- Ajout de regles prioritaires en fin de `src/App.css` pour que les curseurs
+  custom restent actifs malgre les anciennes declarations `pointer/default`.
+- Version projet et bundle passee de `0.1.2` a `0.1.3`.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `git diff --check` : OK.
+- `npm run tauri build` : OK, artefacts Windows `0.1.3` generes.
+- Verification du build frontend : les trois assets de curseur sont presents
+  dans `dist/assets/` et references par le CSS genere.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.3_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.3_x64-setup.exe`
+
+## 2026-05-20 - Correction raccourci Bureau et packaging 0.1.4
+
+Etat :
+
+- Repo local : hook NSIS corrige, versions projet passees en `0.1.4`,
+  documentation projet mise a jour, non committe.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.4`.
+- Installation locale : installateur NSIS `0.1.4` execute en mode silencieux
+  apres autorisation utilisateur ; l'installation locale indique maintenant
+  `DisplayVersion = 0.1.4`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees et raccourci Bureau
+  inspecte via Windows. Validation visuelle finale par l'utilisateur encore
+  necessaire sur le Bureau.
+
+Cause :
+
+- La capture utilisateur montrait encore l'ancienne icone provisoire SVG
+  (carre sombre, cercle dore, petit plateau).
+- L'executable installe contenait bien la nouvelle icone, mais le raccourci
+  Bureau avait `IconLocation=,0`, donc Explorer pouvait reutiliser l'ancienne
+  vignette en cache.
+- Le hook NSIS post-install recreait le raccourci, mais le bouton de fin
+  d'installation pouvait appeler ensuite `CreateOrUpdateDesktopShortcut`, qui
+  reecrivait le raccourci sans chemin d'icone explicite.
+
+Changements effectues :
+
+- `src-tauri/windows/nsis-hooks.nsh` recree maintenant le raccourci Bureau avec
+  l'icone explicite de `othello-island.exe`.
+- Le hook appelle `SetLnkAppUserModelId` sur le raccourci recree.
+- Le hook met `NoShortcutMode` a `1` apres recreation du raccourci pour eviter
+  que la page de fin d'installation le reecrive sans `IconLocation`.
+- Version projet et bundle passee de `0.1.3` a `0.1.4`.
+
+Commandes/verifications effectuees :
+
+- `npm run tauri build` : OK, artefacts Windows `0.1.4` generes.
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- Verification du script NSIS genere : hook `NSIS_HOOK_POSTINSTALL` inclus,
+  `NoShortcutMode` utilise et `SetLnkAppUserModelId` appele.
+- Installation silencieuse de `Othello Island_0.1.4_x64-setup.exe` : OK.
+- Verification du raccourci Bureau :
+  `IconLocation=C:\Users\ArtLi\AppData\Local\Othello Island\othello-island.exe,0`.
+- Rafraichissement leger du cache d'icones Windows via `ie4uinit.exe -show`.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.4_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.4_x64-setup.exe`
+
+## 2026-05-20 - Icone Bureau via fichier ICO versionne 0.1.5
+
+Etat :
+
+- Repo local : hook NSIS corrige pour copier un fichier `.ico` versionne,
+  versions projet passees en `0.1.5`, documentation projet mise a jour, non
+  committe.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.5`.
+- Installation locale : installateur NSIS `0.1.5` execute en mode silencieux
+  apres autorisation utilisateur ; l'installation locale indique maintenant
+  `DisplayVersion = 0.1.5`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees et raccourci Bureau
+  inspecte via Windows. Validation visuelle finale par l'utilisateur encore
+  necessaire sur le Bureau.
+
+Cause :
+
+- Le raccourci Bureau `0.1.4` pointait bien vers l'executable, mais l'affichage
+  Explorer restait encore sur l'ancienne vignette selon le retour utilisateur.
+- Pour contourner le cache base sur `othello-island.exe,0`, le raccourci doit
+  pointer vers un chemin d'icone nouveau et explicite.
+
+Changements effectues :
+
+- `src-tauri/windows/nsis-hooks.nsh` copie maintenant
+  `src-tauri/icons/icon.ico` dans le dossier d'installation sous le nom
+  `othello-island-icon-0.1.5.ico`.
+- Le raccourci Bureau pointe son `IconLocation` vers
+  `othello-island-icon-0.1.5.ico,0`.
+- Les anciens fichiers `othello-island-icon-*.ico` du dossier d'installation
+  sont supprimes avant copie.
+- Version projet et bundle passee de `0.1.4` a `0.1.5`.
+
+Commandes/verifications effectuees :
+
+- `npm run tauri build` : deux echecs intermediaires diagnostiques puis
+  corriges (`/oname` NSIS avec guillemets, puis chemin relatif vers `icon.ico`).
+- `npm run tauri build` final : OK, artefacts Windows `0.1.5` generes.
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `git diff --check` : OK avant mise a jour finale de la documentation.
+- Installation silencieuse de `Othello Island_0.1.5_x64-setup.exe` : OK.
+- Verification du raccourci Bureau :
+  `IconLocation=C:\Users\ArtLi\AppData\Local\Othello Island\othello-island-icon-0.1.5.ico,0`.
+- Verification SHA-256 : le `.ico` installe est identique a
+  `src-tauri/icons/icon.ico`.
+- Rafraichissement leger du cache d'icones Windows via `ie4uinit.exe -show`.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`

@@ -45,6 +45,20 @@ identite visuelle, audio et premiere experience installee.
   boutons, toggles, sliders, icones et curseur custom.
 - [x] Remplacer l'icone applicative provisoire par l'icone Othello Island
   fournie par l'utilisateur.
+- [x] Corriger les options apres retour utilisateur : permissions de fenetre
+  Tauri, mix par defaut musique 90% / ambiance 60%, textes internes retires,
+  icones et libelles agrandis, curseur custom restaure et icone audio
+  utilisee pour Mixage.
+- [x] Reintegrer les deux backgrounds settings panel modifies par
+  l'utilisateur et regenerer les artefacts Windows.
+- [x] Restaurer le footer d'accueil et ajouter un hook NSIS pour recreer le
+  raccourci bureau avec l'icone de l'executable.
+- [x] Regenerer les artefacts Windows `0.1.3` avec le curseur personnalise
+  embarque dans `dist`.
+- [x] Corriger le raccourci Bureau Windows en `0.1.4` pour forcer une icone
+  explicite au lieu de laisser Explorer reutiliser l'ancienne vignette.
+- [x] Remplacer l'IconLocation du raccourci Bureau en `0.1.5` par un fichier
+  `.ico` versionne copie dans le dossier d'installation.
 - [ ] Retester l'installateur Windows apres ecran d'accueil, parametres, retour
   menu, correction de taille de fenetre et option de coups possibles.
 - [ ] Cadrer les options completes.
@@ -83,8 +97,8 @@ identite visuelle, audio et premiere experience installee.
 - Niveau d'IA attendu non choisi.
 - Type de musiques et droits d'utilisation non clarifies.
 - Premiers assets audio fournis et integres. Mixage par defaut corrige pour
-  favoriser la musique, mais le niveau final reste a retester a l'oreille dans
-  l'application installee.
+  mettre la musique a 90% et l'ambiance a 60%, mais le niveau final reste a
+  retester a l'oreille dans l'application installee.
 - Forme exacte de l'histoire / secret a debloquer non definie.
 - Systeme d'evolution visuelle en partie a definir : lumiere, textures,
   details de decor, et conditions de changement.
@@ -92,7 +106,8 @@ identite visuelle, audio et premiere experience installee.
   jeu restent a definir et integrer.
 - Mode responsive/letterbox non implemente : la version courante privilegie une
   base `1600x900` avec mode plein ecran fenetre sans bordure par defaut,
-  plus options vrai plein ecran et fenetre fixe. Ces modes sont a retester dans
+  plus options vrai plein ecran et fenetre fixe. Les permissions Tauri ont ete
+  corrigees le 2026-05-20, mais ces modes sont encore a retester dans
   l'application installee.
 - Aucun blocage packaging connu apres correction Windows et ajout des icones.
 - Release publique non publiee : les artefacts existent localement, mais ne
