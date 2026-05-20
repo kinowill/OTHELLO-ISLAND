@@ -18,6 +18,7 @@ import {
 import { TitleAudioController, type AudioMix } from "./audio/titleAudio";
 
 type Screen = "menu" | "game";
+type GameMode = "campaign" | "local";
 type DisplayMode = "borderless" | "fullscreen" | "windowed";
 
 const DEFAULT_AUDIO_MIX: AudioMix = {
@@ -26,10 +27,17 @@ const DEFAULT_AUDIO_MIX: AudioMix = {
   ui: 0.78,
 };
 
+const TITLE_FADE_DURATION_MS = 760;
+
 const displayModeLabels: Record<DisplayMode, string> = {
   borderless: "Sans bordure",
   fullscreen: "Plein ecran",
   windowed: "Fenetre fixe",
+};
+
+const gameModeLabels: Record<GameMode, string> = {
+  campaign: "Campagne",
+  local: "Multijoueur local",
 };
 
 const playerLabels: Record<Player, string> = {
@@ -95,12 +103,16 @@ const applyDisplayMode = async (mode: DisplayMode) => {
 
 function App() {
   const audioControllerRef = useRef<TitleAudioController | null>(null);
+  const titleFadeTimerRef = useRef<number | null>(null);
   const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("borderless");
   const [screen, setScreen] = useState<Screen>("menu");
+  const [gameMode, setGameMode] = useState<GameMode>("local");
   const [game, setGame] = useState<GameState>(() => createInitialGame());
   const [hasStartedGame, setHasStartedGame] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [modeMenuOpen, setModeMenuOpen] = useState(false);
+  const [titleFading, setTitleFading] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [showLegalMoves, setShowLegalMoves] = useState(false);
   const legalMoves = useMemo(
@@ -145,6 +157,14 @@ function App() {
     void applyDisplayMode(displayMode);
   }, [displayMode]);
 
+  useEffect(() => {
+    return () => {
+      if (titleFadeTimerRef.current) {
+        window.clearTimeout(titleFadeTimerRef.current);
+      }
+    };
+  }, []);
+
   const playHoverSound = () => {
     audioControllerRef.current?.playHover();
   };
@@ -186,6 +206,40 @@ function App() {
     }
   };
 
+  const openModeMenu = () => {
+    if (titleFading) {
+      return;
+    }
+
+    playSelectSound();
+    setSettingsOpen(false);
+    setModeMenuOpen(true);
+  };
+
+  const enterGameFromTitle = (mode: GameMode) => {
+    if (titleFading) {
+      return;
+    }
+
+    playSelectSound();
+    setSettingsOpen(false);
+    setModeMenuOpen(false);
+    setTitleFading(true);
+
+    if (titleFadeTimerRef.current) {
+      window.clearTimeout(titleFadeTimerRef.current);
+    }
+
+    titleFadeTimerRef.current = window.setTimeout(() => {
+      titleFadeTimerRef.current = null;
+      setGameMode(mode);
+      setGame(createInitialGame());
+      setHasStartedGame(true);
+      setScreen("game");
+      setTitleFading(false);
+    }, TITLE_FADE_DURATION_MS);
+  };
+
   const startNewGame = () => {
     playSelectSound();
     setGame(createInitialGame());
@@ -195,14 +249,30 @@ function App() {
   };
 
   const resumeGame = () => {
+    if (titleFading) {
+      return;
+    }
+
     playSelectSound();
     setSettingsOpen(false);
-    setScreen("game");
+    setModeMenuOpen(false);
+    setTitleFading(true);
+
+    if (titleFadeTimerRef.current) {
+      window.clearTimeout(titleFadeTimerRef.current);
+    }
+
+    titleFadeTimerRef.current = window.setTimeout(() => {
+      titleFadeTimerRef.current = null;
+      setScreen("game");
+      setTitleFading(false);
+    }, TITLE_FADE_DURATION_MS);
   };
 
   const openMenu = () => {
     playSelectSound();
     setSettingsOpen(false);
+    setModeMenuOpen(false);
     setScreen("menu");
   };
 
@@ -224,6 +294,48 @@ function App() {
     : game.consecutivePasses > 0
       ? `${playerLabels[game.currentPlayer]} rejoue : aucun coup adverse.`
       : `${playerLabels[game.currentPlayer]} a jouer.`;
+
+  const titleModeMenu = modeMenuOpen ? (
+    <div className="title-mode-menu" role="dialog" aria-modal="true">
+      <section className="title-mode-dialog" aria-labelledby="title-mode-heading">
+        <div className="title-mode-header">
+          <div>
+            <p className="title-mode-kicker">Mode de jeu</p>
+            <h2 id="title-mode-heading">Choisir</h2>
+          </div>
+        </div>
+        <div className="title-mode-section">
+          <div className="title-mode-actions">
+            {(Object.keys(gameModeLabels) as GameMode[]).map((mode) => (
+              <button
+                className={`mode-choice mode-choice-${mode}`}
+                disabled={titleFading}
+                key={mode}
+                onClick={() => enterGameFromTitle(mode)}
+                type="button"
+                {...hoverAudioProps}
+              >
+                <span className="mode-choice-label">{gameModeLabels[mode]}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <button
+          className="title-mode-back"
+          disabled={titleFading}
+          onClick={() => {
+            playSelectSound();
+            setModeMenuOpen(false);
+          }}
+          type="button"
+          {...hoverAudioProps}
+        >
+          <span aria-hidden="true" />
+          Retour
+        </button>
+      </section>
+    </div>
+  ) : null;
 
   const settingsPanel = (
     <div className="settings-overlay" role="dialog" aria-modal="true">
@@ -360,7 +472,7 @@ function App() {
     return (
       <main className="app-shell landing-shell">
         <section
-          className="asset-title-screen"
+          className={`asset-title-screen${titleFading ? " is-fading" : ""}`}
           aria-label="Accueil Othello Island"
         >
           <div className="asset-title-background" aria-hidden="true" />
@@ -370,25 +482,28 @@ function App() {
             <div className="asset-title-menu-panel" aria-hidden="true" />
             <div className="asset-title-actions">
               <button
-                aria-label="Entrer sur l'ile, nouvelle partie"
+                aria-label="Ouvrir le choix du mode de jeu"
                 className="title-action title-action-enter"
-                onClick={startNewGame}
+                disabled={titleFading}
+                onClick={openModeMenu}
                 type="button"
                 {...hoverAudioProps}
               />
               <button
                 aria-label="Reprendre la partie"
                 className="title-action title-action-resume"
-                disabled={!hasStartedGame}
+                disabled={!hasStartedGame || titleFading}
                 onClick={resumeGame}
                 type="button"
-                {...(hasStartedGame ? hoverAudioProps : {})}
+                {...(hasStartedGame && !titleFading ? hoverAudioProps : {})}
               />
               <button
                 aria-label="Parametres"
                 className="title-action title-action-settings"
+                disabled={titleFading}
                 onClick={() => {
                   playSelectSound();
+                  setModeMenuOpen(false);
                   setSettingsOpen(true);
                 }}
                 type="button"
@@ -397,6 +512,7 @@ function App() {
               <button
                 aria-label="Quitter"
                 className="title-action title-action-quit"
+                disabled={titleFading}
                 onClick={() => void quitGame()}
                 type="button"
                 {...hoverAudioProps}
@@ -405,6 +521,8 @@ function App() {
           </nav>
 
           <div className="asset-title-footer" aria-hidden="true" />
+          {titleModeMenu}
+          {titleFading ? <div className="title-fade-overlay" aria-hidden="true" /> : null}
         </section>
         {settingsOpen ? settingsPanel : null}
       </main>
@@ -426,7 +544,7 @@ function App() {
           <span className="chart-star chart-star-c" />
         </div>
         <header className="title-block">
-          <p className="eyebrow">Prototype jouable</p>
+          <p className="eyebrow">{gameModeLabels[gameMode]}</p>
           <h1>Othello Island</h1>
           <p className="subtitle">
             Un Othello classique pose sur une table d'ile ancienne : signes

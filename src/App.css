@@ -300,6 +300,281 @@ button:disabled {
   background-image: url("./assets/title/ui_title_button_quit_selected_02.png");
 }
 
+.asset-title-screen.is-fading .asset-title-menu,
+.asset-title-screen.is-fading .title-mode-menu {
+  pointer-events: none;
+}
+
+.title-mode-menu {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(235, 182, 74, 0.11), transparent 34%),
+    repeating-linear-gradient(rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 4px),
+    rgba(0, 0, 0, 0.58);
+  animation: titleModeIn 180ms steps(4) both;
+}
+
+.title-mode-dialog {
+  position: relative;
+  width: 560px;
+  min-height: 640px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+  padding: 120px 82px 58px;
+  border: 0;
+  color: var(--wax);
+  background-image: url("./assets/settings/settings_background_panel_idle.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.78),
+    0 0 48px rgba(235, 182, 74, 0.1);
+  image-rendering: pixelated;
+}
+
+.title-mode-dialog::before,
+.title-mode-dialog::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.title-mode-dialog::before {
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  background-image: url("./assets/settings/settings_background_panel_glow.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  animation: settingsPanelPulse 4.6s steps(2) infinite;
+}
+
+.title-mode-dialog::after {
+  inset: 116px 78px 54px;
+  z-index: 0;
+  opacity: 0.16;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(243, 234, 216, 0.08) 0,
+      rgba(243, 234, 216, 0.08) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  mix-blend-mode: overlay;
+}
+
+.title-mode-header,
+.title-mode-section,
+.title-mode-back {
+  position: relative;
+  z-index: 1;
+}
+
+.title-mode-header {
+  display: grid;
+  place-items: center;
+  min-height: 74px;
+  margin: 0 0 18px;
+  padding: 8px 6px 0;
+  text-align: center;
+}
+
+.title-mode-kicker {
+  margin: 0 0 4px;
+  color: var(--brass);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.9),
+    0 0 8px rgba(192, 164, 107, 0.28);
+}
+
+.title-mode-dialog h2 {
+  margin: 0;
+  color: var(--wax);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.55rem;
+  font-variant: small-caps;
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.74);
+}
+
+.title-mode-section {
+  display: grid;
+  align-items: center;
+  min-height: 286px;
+  padding: 42px 40px 38px;
+  background-image: url("./assets/settings/settings_section_panel_idle.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.24));
+}
+
+.title-mode-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: url("./assets/settings/settings_section_panel_glow.png") center / 100% 100% no-repeat;
+  animation: settingsSectionPulse 5.8s steps(2) infinite;
+}
+
+.title-mode-actions {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 12px;
+}
+
+.mode-choice,
+.title-mode-back {
+  position: relative;
+  min-height: 74px;
+  padding: 12px 42px 10px;
+  border: 0;
+  color: var(--wax);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.94rem;
+  font-variant: small-caps;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: none;
+  image-rendering: pixelated;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.92),
+    0 0 8px rgba(192, 164, 107, 0.24);
+}
+
+.mode-choice {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 18px solid transparent;
+  border-image-source: url("./assets/settings/settings_button_empty_medium_idle.png");
+  border-image-slice: 25 24 25 24;
+  border-image-width: 18px;
+  border-image-repeat: stretch;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(10, 20, 29, 0.94), rgba(3, 8, 13, 0.94));
+  background-size: 100% 4px, auto;
+  box-shadow:
+    inset 0 0 0 1px rgba(192, 164, 107, 0.22),
+    0 5px 0 rgba(0, 0, 0, 0.36);
+  --mode-label-color: var(--wax);
+  white-space: nowrap;
+}
+
+.mode-choice:disabled {
+  --mode-label-color: var(--ash);
+}
+
+.mode-choice::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(192, 164, 107, 0.44);
+  background:
+    linear-gradient(90deg, rgba(192, 164, 107, 0.16), transparent 18%, transparent 82%, rgba(192, 164, 107, 0.16)),
+    transparent;
+}
+
+.mode-choice-label {
+  position: relative;
+  z-index: 1;
+  color: var(--mode-label-color);
+}
+
+.mode-choice:not(:disabled):hover,
+.mode-choice:not(:disabled):focus-visible {
+  --mode-label-color: var(--brass);
+  outline: none;
+  border-image-source: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.045) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(20, 31, 36, 0.96), rgba(7, 14, 19, 0.96));
+  background-size: 100% 4px, auto;
+  filter: drop-shadow(0 0 12px rgba(235, 182, 74, 0.34));
+}
+
+.title-mode-back:hover,
+.title-mode-back:focus-visible {
+  color: var(--brass);
+  outline: none;
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+  filter: drop-shadow(0 0 12px rgba(235, 182, 74, 0.34));
+}
+
+.mode-choice:active {
+  border-image-source: url("./assets/settings/settings_button_empty_medium_selected_02.png");
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.025) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(3, 8, 13, 0.96), rgba(15, 22, 28, 0.96));
+  background-size: 100% 4px, auto;
+}
+
+.title-mode-back:active {
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_02.png");
+}
+
+.title-mode-back {
+  justify-self: start;
+  min-height: 84px;
+  width: 235px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  margin-left: 40px;
+  padding: 10px 24px 10px 18px;
+  color: var(--ash);
+  font-size: 0.9rem;
+  text-align: left;
+  background: url("./assets/settings/settings_button_empty_medium_idle.png") center / 100% 100% no-repeat;
+}
+
+.title-mode-back span {
+  width: 34px;
+  height: 36px;
+  background: url("./assets/settings/settings_icon_back.png") center / contain no-repeat;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.32));
+}
+
+.title-fade-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  animation: titleFadeToBlack 760ms ease-in forwards;
+}
+
 .asset-title-footer {
   position: absolute;
   left: 54px;
@@ -2276,6 +2551,29 @@ button:disabled,
   }
   79%,
   86% {
+    opacity: 1;
+  }
+}
+
+@keyframes titleModeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes titleFadeToBlack {
+  0% {
+    opacity: 0;
+  }
+  38% {
+    opacity: 0.58;
+  }
+  100% {
     opacity: 1;
   }
 }

@@ -59,6 +59,8 @@ identite visuelle, audio et premiere experience installee.
   explicite au lieu de laisser Explorer reutiliser l'ancienne vignette.
 - [x] Remplacer l'IconLocation du raccourci Bureau en `0.1.5` par un fichier
   `.ico` versionne copie dans le dossier d'installation.
+- [x] Ajouter un choix de mode sur l'accueil : `Campagne` /
+  `Multijoueur local`, avec fondu noir avant l'entree en partie.
 - [ ] Retester l'installateur Windows apres ecran d'accueil, parametres, retour
   menu, correction de taille de fenetre et option de coups possibles.
 - [ ] Cadrer les options completes.
@@ -100,6 +102,8 @@ identite visuelle, audio et premiere experience installee.
   mettre la musique a 90% et l'ambiance a 60%, mais le niveau final reste a
   retester a l'oreille dans l'application installee.
 - Forme exacte de l'histoire / secret a debloquer non definie.
+- Mode `Campagne` non implemente comme gameplay distinct : l'entree existe dans
+  l'accueil, mais le contenu et la progression restent a definir.
 - Systeme d'evolution visuelle en partie a definir : lumiere, textures,
   details de decor, et conditions de changement.
 - Assets d'accueil et kit de parametres 32-bit integres. Les autres textures de

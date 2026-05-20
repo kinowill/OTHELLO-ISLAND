@@ -1140,3 +1140,64 @@ Etat :
 Commit pousse :
 
 - `49f9bf0 fix: stabilize desktop settings packaging`
+
+## 2026-05-20 - Choix de mode accueil et fondu noir
+
+Etat :
+
+- Repo local : accueil modifie pour ouvrir un choix `Campagne` /
+  `Multijoueur local` avant entree en partie, documentation projet mise a jour,
+  non committe.
+- Distribution locale : executable Windows, MSI et installateur NSIS regeneres
+  en version `0.1.5`.
+- Release publique : non publiee.
+- Validation reelle : validations automatisees effectuees. Verification
+  visuelle automatisee effectuee en Chrome headless via DevTools Protocol,
+  apres lancement du serveur Vite hors sandbox.
+
+Changements effectues :
+
+- Le bouton d'entree de l'accueil ouvre un sous-menu de mode au lieu de lancer
+  directement le plateau.
+- Ajout des choix `Campagne` et `Multijoueur local`.
+- Le clic sur un mode ferme le sous-menu, affiche un fondu noir, puis charge le
+  plateau.
+- `Multijoueur local` correspond au gameplay jouable actuel. `Campagne` est une
+  entree d'interface preparee, sans contenu de campagne distinct pour l'instant.
+- Aucun nouvel asset PNG n'a ete ajoute : la fenetre de choix reutilise les
+  assets existants du kit parametres (`settings_background_panel`,
+  `settings_section_panel`, `settings_button_empty_medium` pour le bouton
+  retour et icone back), le curseur custom et les sons UI. Les deux boutons de
+  choix sont dessines en CSS pour eviter les fleches/chevrons integres aux
+  assets `settings_button_empty_medium`.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm audit --audit-level=high` : OK, 0 vulnerabilite.
+- `npm run tauri build` : OK, artefacts Windows `0.1.5` regeneres.
+- `npm run dev -- --host 127.0.0.1` en sandbox : KO, bloque par `spawn EPERM`
+  au lancement d'esbuild/Vite.
+- `npm run dev -- --host 127.0.0.1` hors sandbox : OK,
+  `http://127.0.0.1:1420`.
+- Capture Chrome headless initiale : OK.
+- Verification DevTools Protocol : bouton d'entree present, sous-menu visible
+  apres clic, choix `Campagne` et `Multijoueur local` presents, fondu noir
+  actif apres clic sur `Multijoueur local`, plateau charge ensuite avec 64
+  cases et libelle de mode `Multijoueur local`.
+- Verification visuelle apres reprise DA : la fenetre de choix charge bien les
+  backgrounds `settings_background_panel_idle.png` et
+  `settings_section_panel_idle.png`, utilise une typographie serif plus proche
+  de la jaquette/menu, descend le titre sous l'ornement central, aligne le
+  bouton `Retour` avec les choix, et n'affiche plus les fleches/symboles des
+  boutons de choix. Les choix utilisent maintenant l'asset
+  `settings_button_empty_medium_idle.png` en `border-image` pour garder le
+  cadre dore sans reprendre les symboles lateraux.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`

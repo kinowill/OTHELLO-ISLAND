@@ -24,6 +24,9 @@ public signe. Il reste un projet personnel.
   fond nocturne, logo, panneau de menu, boutons et footer.
 - Accueil compose sur une base `1600x900`, avec mode par defaut en plein
   ecran fenetre sans bordure applique au lancement.
+- L'accueil ouvre maintenant un choix de mode avant l'entree en partie :
+  `Campagne` ou `Multijoueur local`, puis applique un fondu noir avant de
+  charger le plateau.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
   ambiance sonore, coups possibles, mixage separe musique / ambiance / UI,
   lueurs de panneau.
@@ -106,6 +109,9 @@ Structure actuelle :
   proposent aussi un vrai plein ecran et un retour en fenetre fixe `1600x900`.
   Un mode scale/letterbox pourra remplacer cette contrainte plus tard si le
   support de petits ecrans devient prioritaire.
+- Le choix de mode de l'accueil est une preparation produit : `Multijoueur
+  local` correspond au plateau jouable actuel. `Campagne` est visible comme
+  entree d'interface, mais son contenu dedie reste a cadrer et implementer.
 - Les appels Tauri de gestion de fenetre doivent etre autorises dans
   `src-tauri/capabilities/default.json`. Sans ces permissions, les boutons de
   mode d'affichage peuvent ne rien changer dans l'application desktop.
