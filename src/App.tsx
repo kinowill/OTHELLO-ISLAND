@@ -9,6 +9,7 @@ import {
   applyMove,
   countDiscs,
   createInitialGame,
+  getFlipsForMove,
   getLegalMoves,
   isLegalMove,
   type GameState,
@@ -17,8 +18,9 @@ import {
 } from "./game/othello";
 import { TitleAudioController, type AudioMix } from "./audio/titleAudio";
 
-type Screen = "menu" | "game";
+type Screen = "menu" | "game" | "campaign";
 type GameMode = "campaign" | "local";
+type CampaignScene = "approach" | "door" | "board";
 type DisplayMode = "borderless" | "fullscreen" | "windowed";
 
 const DEFAULT_AUDIO_MIX: AudioMix = {
@@ -28,6 +30,10 @@ const DEFAULT_AUDIO_MIX: AudioMix = {
 };
 
 const TITLE_FADE_DURATION_MS = 760;
+const CAMPAIGN_APPROACH_DURATION_MS = 3_600;
+const DOOR_MOVE_DELAY_MS = 900;
+const CAMPAIGN_FLIP_DURATION_MS = 720;
+const SAD_EASTER_EGG_CHANCE = 0.006;
 
 const displayModeLabels: Record<DisplayMode, string> = {
   borderless: "Sans bordure",
@@ -45,8 +51,45 @@ const playerLabels: Record<Player, string> = {
   light: "Blanc",
 };
 
+const CAMPAIGN_MESSAGES = {
+  shadow: "Des bruits etranges emanent de l'ombre...",
+  door: "Cette porte semble fermee par un lourd mecanisme.",
+  eye: "Cet oeil... mieux vaut ne pas trainer la.",
+  approachBoard: "Je pense pouvoir y arriver.",
+  firstDoorMove: "Les... LES PIONS BOUGENT TOUT SEUL !!!??",
+  darkWin: "Le mecanisme cede. La porte s'entrouvre.",
+  lightWin: "La porte resiste encore.",
+  draw: "Le mecanisme reste immobile.",
+} as const;
+
 const cellName = ({ row, col }: Position): string =>
   `${String.fromCharCode(65 + col)}${row + 1}`;
+
+const positionKey = ({ row, col }: Position): string => `${row}-${col}`;
+
+const isCornerMove = ({ row, col }: Position): boolean =>
+  (row === 0 || row === 7) && (col === 0 || col === 7);
+
+const isEdgeMove = ({ row, col }: Position): boolean =>
+  row === 0 || row === 7 || col === 0 || col === 7;
+
+const selectDoorMove = (
+  board: GameState["board"],
+  legalMoves: Position[],
+): Position | null => {
+  if (legalMoves.length === 0) {
+    return null;
+  }
+
+  return [...legalMoves].sort((a, b) => {
+    const aFlips = getFlipsForMove(board, "light", a).length;
+    const bFlips = getFlipsForMove(board, "light", b).length;
+    const aWeight = (isCornerMove(a) ? 8 : 0) + (isEdgeMove(a) ? 2 : 0) + aFlips;
+    const bWeight = (isCornerMove(b) ? 8 : 0) + (isEdgeMove(b) ? 2 : 0) + bFlips;
+
+    return aWeight - bWeight || a.row - b.row || a.col - b.col;
+  })[0];
+};
 
 const applyDisplayMode = async (mode: DisplayMode) => {
   try {
@@ -103,8 +146,23 @@ const applyDisplayMode = async (mode: DisplayMode) => {
 
 function App() {
   const audioControllerRef = useRef<TitleAudioController | null>(null);
+  const campaignApproachTimerRef = useRef<number | null>(null);
+  const campaignFlipTimerRef = useRef<number | null>(null);
+  const doorMoveTimerRef = useRef<number | null>(null);
   const titleFadeTimerRef = useRef<number | null>(null);
   const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
+  const [campaignChoiceOpen, setCampaignChoiceOpen] = useState(false);
+  const [campaignFlippingCells, setCampaignFlippingCells] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [campaignFlipDirection, setCampaignFlipDirection] = useState<
+    "dark-to-light" | "light-to-dark"
+  >("dark-to-light");
+  const [campaignMessage, setCampaignMessage] = useState("");
+  const [campaignQuickMenuOpen, setCampaignQuickMenuOpen] = useState(false);
+  const [campaignScene, setCampaignScene] =
+    useState<CampaignScene>("approach");
+  const [doorHasMoved, setDoorHasMoved] = useState(false);
   const [displayMode, setDisplayMode] = useState<DisplayMode>("borderless");
   const [screen, setScreen] = useState<Screen>("menu");
   const [gameMode, setGameMode] = useState<GameMode>("local");
@@ -159,11 +217,132 @@ function App() {
 
   useEffect(() => {
     return () => {
+      if (campaignApproachTimerRef.current) {
+        window.clearTimeout(campaignApproachTimerRef.current);
+      }
+
+      if (doorMoveTimerRef.current) {
+        window.clearTimeout(doorMoveTimerRef.current);
+      }
+
+      if (campaignFlipTimerRef.current) {
+        window.clearTimeout(campaignFlipTimerRef.current);
+      }
+
       if (titleFadeTimerRef.current) {
         window.clearTimeout(titleFadeTimerRef.current);
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (screen !== "campaign" || campaignScene !== "approach") {
+      return;
+    }
+
+    setCampaignMessage("");
+    setCampaignChoiceOpen(false);
+    setCampaignQuickMenuOpen(false);
+
+    if (campaignApproachTimerRef.current) {
+      window.clearTimeout(campaignApproachTimerRef.current);
+    }
+
+    campaignApproachTimerRef.current = window.setTimeout(() => {
+      campaignApproachTimerRef.current = null;
+      setCampaignScene("door");
+      void audioControllerRef.current
+        ?.startCampaignMusic(4)
+        .catch(() => undefined);
+    }, CAMPAIGN_APPROACH_DURATION_MS);
+
+    return () => {
+      if (campaignApproachTimerRef.current) {
+        window.clearTimeout(campaignApproachTimerRef.current);
+        campaignApproachTimerRef.current = null;
+      }
+    };
+  }, [campaignScene, screen]);
+
+  useEffect(() => {
+    if (
+      screen !== "campaign" ||
+      campaignScene !== "board" ||
+      game.currentPlayer !== "light" ||
+      game.winner
+    ) {
+      return;
+    }
+
+    if (doorMoveTimerRef.current) {
+      window.clearTimeout(doorMoveTimerRef.current);
+    }
+
+    doorMoveTimerRef.current = window.setTimeout(() => {
+      doorMoveTimerRef.current = null;
+      const doorMoves = getLegalMoves(game.board, "light");
+      const doorMove = selectDoorMove(game.board, doorMoves);
+
+      if (!doorMove) {
+        return;
+      }
+
+      const next = applyMove(game, doorMove);
+
+      if (!next) {
+        return;
+      }
+
+      const flippedCells = new Set(
+        getFlipsForMove(game.board, "light", doorMove).map(positionKey),
+      );
+
+      setCampaignFlipDirection("dark-to-light");
+      setCampaignFlippingCells(flippedCells);
+
+      if (campaignFlipTimerRef.current) {
+        window.clearTimeout(campaignFlipTimerRef.current);
+      }
+
+      campaignFlipTimerRef.current = window.setTimeout(() => {
+        campaignFlipTimerRef.current = null;
+        setCampaignFlippingCells(new Set());
+      }, CAMPAIGN_FLIP_DURATION_MS);
+
+      audioControllerRef.current?.playDoorLocked();
+
+      if (!doorHasMoved) {
+        setDoorHasMoved(true);
+        setCampaignMessage(CAMPAIGN_MESSAGES.firstDoorMove);
+        window.setTimeout(() => audioControllerRef.current?.playSpeak(), 160);
+      }
+
+      setGame(next);
+    }, DOOR_MOVE_DELAY_MS);
+
+    return () => {
+      if (doorMoveTimerRef.current) {
+        window.clearTimeout(doorMoveTimerRef.current);
+        doorMoveTimerRef.current = null;
+      }
+    };
+  }, [campaignScene, doorHasMoved, game, screen]);
+
+  useEffect(() => {
+    if (screen !== "campaign" || campaignScene !== "board" || !game.winner) {
+      return;
+    }
+
+    const message =
+      game.winner === "dark"
+        ? CAMPAIGN_MESSAGES.darkWin
+        : game.winner === "light"
+          ? CAMPAIGN_MESSAGES.lightWin
+          : CAMPAIGN_MESSAGES.draw;
+
+    setCampaignMessage(message);
+    audioControllerRef.current?.playDoorLocked();
+  }, [campaignScene, game.winner, screen]);
 
   const playHoverSound = () => {
     audioControllerRef.current?.playHover();
@@ -173,9 +352,27 @@ function App() {
     audioControllerRef.current?.playSelect();
   };
 
+  const playSpeakSound = () => {
+    audioControllerRef.current?.playSpeak();
+  };
+
+  const playCampaignWrongClick = () => {
+    if (Math.random() < SAD_EASTER_EGG_CHANCE) {
+      audioControllerRef.current?.playSadEasterEgg();
+      return;
+    }
+
+    audioControllerRef.current?.playWrongClick();
+  };
+
   const hoverAudioProps = {
     onFocus: playHoverSound,
     onPointerEnter: playHoverSound,
+  };
+
+  const showCampaignThought = (message: string) => {
+    setCampaignMessage(message);
+    playSpeakSound();
   };
 
   const updateAudioMix = (key: keyof AudioMix, value: string) => {
@@ -206,6 +403,66 @@ function App() {
     }
   };
 
+  const playCampaignMove = (position: Position) => {
+    if (game.currentPlayer !== "dark" || game.winner) {
+      playCampaignWrongClick();
+      return;
+    }
+
+    const next = applyMove(game, position);
+
+    if (!next) {
+      playCampaignWrongClick();
+      return;
+    }
+
+    const flippedCells = new Set(
+      getFlipsForMove(game.board, "dark", position).map(positionKey),
+    );
+
+    setCampaignFlipDirection("light-to-dark");
+    setCampaignFlippingCells(flippedCells);
+
+    if (campaignFlipTimerRef.current) {
+      window.clearTimeout(campaignFlipTimerRef.current);
+    }
+
+    campaignFlipTimerRef.current = window.setTimeout(() => {
+      campaignFlipTimerRef.current = null;
+      setCampaignFlippingCells(new Set());
+    }, CAMPAIGN_FLIP_DURATION_MS);
+
+    playSelectSound();
+    setGame(next);
+  };
+
+  const beginCampaignBoard = () => {
+    playSelectSound();
+    setCampaignChoiceOpen(false);
+    setCampaignScene("board");
+    setGameMode("campaign");
+    setGame(createInitialGame());
+    setDoorHasMoved(false);
+    setCampaignFlippingCells(new Set());
+    setCampaignQuickMenuOpen(false);
+    audioControllerRef.current?.playCampaignSting();
+    showCampaignThought(CAMPAIGN_MESSAGES.approachBoard);
+  };
+
+  const resetCampaignScene = () => {
+    playSelectSound();
+    setCampaignChoiceOpen(false);
+    setCampaignMessage("");
+    setCampaignQuickMenuOpen(false);
+    setCampaignScene("door");
+    setGame(createInitialGame());
+    setDoorHasMoved(false);
+    setCampaignFlippingCells(new Set());
+    void audioControllerRef.current
+      ?.startCampaignMusic(2.2)
+      .catch(() => undefined);
+  };
+
   const openModeMenu = () => {
     if (titleFading) {
       return;
@@ -225,9 +482,16 @@ function App() {
     setSettingsOpen(false);
     setModeMenuOpen(false);
     setTitleFading(true);
+    setCampaignQuickMenuOpen(false);
 
     if (titleFadeTimerRef.current) {
       window.clearTimeout(titleFadeTimerRef.current);
+    }
+
+    if (mode === "campaign") {
+      void audioControllerRef.current
+        ?.fadeOutMenuMusic(1.2)
+        .catch(() => undefined);
     }
 
     titleFadeTimerRef.current = window.setTimeout(() => {
@@ -235,7 +499,12 @@ function App() {
       setGameMode(mode);
       setGame(createInitialGame());
       setHasStartedGame(true);
-      setScreen("game");
+      setDoorHasMoved(false);
+      setCampaignFlippingCells(new Set());
+      setCampaignChoiceOpen(false);
+      setCampaignMessage("");
+      setCampaignScene("approach");
+      setScreen(mode === "campaign" ? "campaign" : "game");
       setTitleFading(false);
     }, TITLE_FADE_DURATION_MS);
   };
@@ -245,6 +514,7 @@ function App() {
     setGame(createInitialGame());
     setHasStartedGame(true);
     setSettingsOpen(false);
+    setGameMode("local");
     setScreen("game");
   };
 
@@ -258,14 +528,26 @@ function App() {
     setModeMenuOpen(false);
     setTitleFading(true);
 
+    if (gameMode === "campaign") {
+      void audioControllerRef.current
+        ?.fadeOutMenuMusic(1.2)
+        .catch(() => undefined);
+    }
+
     if (titleFadeTimerRef.current) {
       window.clearTimeout(titleFadeTimerRef.current);
     }
 
     titleFadeTimerRef.current = window.setTimeout(() => {
       titleFadeTimerRef.current = null;
-      setScreen("game");
+      setScreen(gameMode === "campaign" ? "campaign" : "game");
       setTitleFading(false);
+
+      if (gameMode === "campaign" && campaignScene !== "approach") {
+        void audioControllerRef.current
+          ?.startCampaignMusic(2.4)
+          .catch(() => undefined);
+      }
     }, TITLE_FADE_DURATION_MS);
   };
 
@@ -273,6 +555,11 @@ function App() {
     playSelectSound();
     setSettingsOpen(false);
     setModeMenuOpen(false);
+    if (screen === "campaign") {
+      void audioControllerRef.current
+        ?.returnToMenuMusic(2.8)
+        .catch(() => undefined);
+    }
     setScreen("menu");
   };
 
@@ -355,13 +642,6 @@ function App() {
           >
             Retour
           </button>
-        </div>
-
-        <div className="settings-tabs" aria-hidden="true">
-          <span className="settings-tab settings-tab-display" />
-          <span className="settings-tab settings-tab-audio" />
-          <span className="settings-tab settings-tab-gameplay" />
-          <span className="settings-tab settings-tab-controls" />
         </div>
 
         <div className="settings-list">
@@ -468,6 +748,211 @@ function App() {
     </div>
   );
 
+  const campaignQuickMenu = (
+    <>
+      <button
+        aria-expanded={campaignQuickMenuOpen}
+        aria-label="Menu campagne"
+        className="campaign-menu-button"
+        onClick={() => {
+          playSelectSound();
+          setCampaignQuickMenuOpen((isOpen) => !isOpen);
+        }}
+        type="button"
+        {...hoverAudioProps}
+      >
+        <span aria-hidden="true" />
+      </button>
+      {campaignQuickMenuOpen ? (
+        <div className="campaign-quick-menu" role="dialog" aria-label="Menu campagne">
+          <button
+            className="campaign-menu-entry"
+            onClick={() => {
+              playSelectSound();
+              setSettingsOpen(true);
+              setCampaignQuickMenuOpen(false);
+            }}
+            type="button"
+            {...hoverAudioProps}
+          >
+            Parametres
+          </button>
+          <button
+            className="campaign-menu-entry"
+            disabled
+            type="button"
+          >
+            Sauvegarder
+          </button>
+          <button
+            className="campaign-menu-entry"
+            onClick={openMenu}
+            type="button"
+            {...hoverAudioProps}
+          >
+            Menu
+          </button>
+        </div>
+      ) : null}
+    </>
+  );
+
+  const campaignDialogue = campaignMessage ? (
+    <div className="campaign-dialogue" role="status">
+      <p>{campaignMessage}</p>
+    </div>
+  ) : null;
+
+  const campaignChoice = campaignChoiceOpen ? (
+    <div className="campaign-choice-panel" role="dialog" aria-label="Plateau">
+      <button
+        className="campaign-choice-action"
+        onClick={beginCampaignBoard}
+        type="button"
+        {...hoverAudioProps}
+      >
+        S'approcher
+      </button>
+      <button
+        className="campaign-choice-action campaign-choice-cancel"
+        onClick={() => {
+          playSelectSound();
+          setCampaignChoiceOpen(false);
+        }}
+        type="button"
+        {...hoverAudioProps}
+      >
+        Annuler
+      </button>
+    </div>
+  ) : null;
+
+  const campaignDoorScene = (
+    <div className="campaign-scene campaign-scene-door">
+      <button
+        aria-label="Zone non interactive"
+        className="campaign-wrong-surface"
+        onClick={playCampaignWrongClick}
+        type="button"
+      />
+      <button
+        aria-label="Herbes dans l'ombre"
+        className="campaign-hotspot hotspot-shadow"
+        onClick={() => showCampaignThought(CAMPAIGN_MESSAGES.shadow)}
+        type="button"
+        {...hoverAudioProps}
+      />
+      <button
+        aria-label="Porte fermee"
+        className="campaign-hotspot hotspot-door"
+        onClick={() => {
+          audioControllerRef.current?.playDoorLocked();
+          setCampaignMessage(CAMPAIGN_MESSAGES.door);
+        }}
+        type="button"
+        {...hoverAudioProps}
+      />
+      <button
+        aria-label="Oeil de la porte"
+        className="campaign-hotspot hotspot-eye"
+        onClick={() => {
+          audioControllerRef.current?.playDoorEye();
+          setCampaignMessage(CAMPAIGN_MESSAGES.eye);
+        }}
+        type="button"
+        {...hoverAudioProps}
+      />
+      <button
+        aria-label="Plateau d'Othello avec une cle"
+        className="campaign-hotspot hotspot-board"
+        onClick={() => {
+          playSelectSound();
+          setCampaignChoiceOpen(true);
+          setCampaignMessage("");
+        }}
+        type="button"
+        {...hoverAudioProps}
+      />
+      {campaignQuickMenu}
+      {campaignChoice}
+      {campaignDialogue}
+    </div>
+  );
+
+  const campaignBoardScene = (
+    <div className="campaign-scene campaign-scene-board">
+      <div className="campaign-board-hud" aria-label="Etat de la partie">
+        <div>
+          <p className="panel-kicker">La porte</p>
+          <strong>{statusText}</strong>
+        </div>
+        <div className="campaign-score">
+          <span>Noir {score.dark}</span>
+          <span>Blanc {score.light}</span>
+        </div>
+      </div>
+      {campaignQuickMenu}
+      <div className="campaign-board-grid" role="grid" aria-label="Plateau campagne">
+        {game.board.map((row, rowIndex) =>
+          row.map((cell, colIndex) => {
+            const position = { row: rowIndex, col: colIndex };
+            const legal =
+              game.currentPlayer === "dark" &&
+              !game.winner &&
+              isLegalMove(legalMoves, position);
+            const flipping = campaignFlippingCells.has(positionKey(position));
+
+            return (
+              <button
+                aria-label={`${cellName(position)} ${
+                  cell
+                    ? `occupe par ${playerLabels[cell]}`
+                    : legal
+                      ? "coup legal"
+                      : "case vide"
+                }`}
+                className={`campaign-board-cell ${legal ? "playable" : ""} ${
+                  showLegalMoves && legal ? "legal" : ""
+                }`}
+                key={`${rowIndex}-${colIndex}`}
+                onClick={() => playCampaignMove(position)}
+                onFocus={legal ? playHoverSound : undefined}
+                onPointerEnter={legal ? playHoverSound : undefined}
+                type="button"
+              >
+                {cell ? (
+                  <span
+                    className={`campaign-disc ${cell} ${
+                      flipping
+                        ? campaignFlipDirection === "dark-to-light"
+                          ? "is-flipping-light"
+                          : "is-flipping-dark"
+                        : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                ) : showLegalMoves && legal ? (
+                  <span className="campaign-legal-dot" aria-hidden="true" />
+                ) : null}
+              </button>
+            );
+          }),
+        )}
+      </div>
+      <div className="campaign-board-actions">
+        <button
+          className="campaign-choice-action"
+          onClick={resetCampaignScene}
+          type="button"
+          {...hoverAudioProps}
+        >
+          Reculer
+        </button>
+      </div>
+      {campaignDialogue}
+    </div>
+  );
+
   if (screen === "menu") {
     return (
       <main className="app-shell landing-shell">
@@ -523,6 +1008,26 @@ function App() {
           <div className="asset-title-footer" aria-hidden="true" />
           {titleModeMenu}
           {titleFading ? <div className="title-fade-overlay" aria-hidden="true" /> : null}
+        </section>
+        {settingsOpen ? settingsPanel : null}
+      </main>
+    );
+  }
+
+  if (screen === "campaign") {
+    return (
+      <main className="app-shell campaign-shell">
+        <section
+          className={`campaign-stage campaign-stage-${campaignScene}`}
+          aria-label="Campagne Othello Island"
+        >
+          {campaignScene === "approach" ? (
+            <div className="campaign-scene campaign-scene-far" aria-hidden="true" />
+          ) : campaignScene === "door" ? (
+            campaignDoorScene
+          ) : (
+            campaignBoardScene
+          )}
         </section>
         {settingsOpen ? settingsPanel : null}
       </main>

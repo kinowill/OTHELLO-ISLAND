@@ -61,11 +61,23 @@ identite visuelle, audio et premiere experience installee.
   `.ico` versionne copie dans le dossier d'installation.
 - [x] Ajouter un choix de mode sur l'accueil : `Campagne` /
   `Multijoueur local`, avec fondu noir avant l'entree en partie.
+- [x] Cadrer le premier beat de campagne : point & click devant le manoir,
+  porte verrouillee par un plateau d'Othello, duel tutoriel contre la porte.
+- [x] Documenter le prologue campagne, les hotspots, textes, sons et assets
+  fournis dans `CAMPAIGN_PROLOGUE.md`.
 - [ ] Retester l'installateur Windows apres ecran d'accueil, parametres, retour
   menu, correction de taille de fenetre et option de coups possibles.
 - [ ] Cadrer les options completes.
 - [x] Choisir ou fournir des assets audio ocean / ambient mysterieuse.
-- [ ] Cadrer la couche histoire / secret a debloquer.
+- [x] Fournir les premiers assets campagne dans `ITERATIONS VISUELLES/ASSETS/03`
+  : vues manoir, plateau, pions, animation de retournement, musique et sons.
+- [x] Copier les assets campagne retenus dans `src/assets/`.
+- [ ] Completer ou produire les sons absents : marche, pion pose, retournement,
+  reaction de porte, serrure et ouverture finale si les sons fournis ne
+  suffisent pas.
+- [x] Implementer la scene point & click de campagne et le hotspot du plateau.
+- [x] Implementer le duel tutoriel contre la porte avec IA simple.
+- [ ] Cadrer la couche histoire / secret a debloquer apres la premiere porte.
 - [ ] Cadrer les textures evolutives et changements d'ambiance pendant la
   partie.
 - [ ] Definir la liste prioritaire de textures 32-bit a generer et integrer.
@@ -101,9 +113,17 @@ identite visuelle, audio et premiere experience installee.
 - Premiers assets audio fournis et integres. Mixage par defaut corrige pour
   mettre la musique a 90% et l'ambiance a 60%, mais le niveau final reste a
   retester a l'oreille dans l'application installee.
-- Forme exacte de l'histoire / secret a debloquer non definie.
-- Mode `Campagne` non implemente comme gameplay distinct : l'entree existe dans
-  l'accueil, mais le contenu et la progression restent a definir.
+- Premier beat de campagne defini : approche point & click du manoir, porte
+  proche, plateau/cle cliquable, duel tutoriel contre "la porte", victoire qui
+  ouvre la porte.
+- Mode `Campagne` implemente localement comme gameplay distinct : intro manoir,
+  scene point & click, plateau MAP1 et duel contre "la porte". Validation
+  navigateur locale effectuee, executable et installateurs Windows `0.1.5`
+  regeneres, mais application installee non retestee depuis cette integration.
+- IA de campagne implementee en premiere version simple : elle joue blanc
+  legalement apres un court delai et choisit volontairement des coups peu
+  agressifs. Son niveau reste a ajuster apres test humain.
+- Forme exacte de l'histoire / secret apres la premiere porte non definie.
 - Systeme d'evolution visuelle en partie a definir : lumiere, textures,
   details de decor, et conditions de changement.
 - Assets d'accueil et kit de parametres 32-bit integres. Les autres textures de
@@ -139,6 +159,20 @@ identite visuelle, audio et premiere experience installee.
 - Les futures textures peuvent devenir evolutives pendant la partie : lumiere
   qui baisse, signes qui apparaissent, decor qui se charge de details, ou autre
   progression visuelle a definir.
+- Assets campagne prioritaires a generer :
+  vue basse depuis l'ile en direction du manoir, vue tres proche de la porte,
+  porte avec plateau d'Othello et cle dessinee comme indice cliquable, porte
+  entrouverte ou ouverte, plateau vu du dessus pour le duel contre la porte.
+- Audio campagne prioritaire :
+  musique specifique du seuil, ambiance de manoir/ile proche, fondu de sortie
+  de la musique menu, sons de pion pose, retournement, reaction de la porte,
+  serrure et ouverture finale.
+- Les assets `ASSETS/03` retenus sont copies dans `src/assets/campaign/` :
+  manoir loin, manoir proche, plateau campagne, pions noir/blanc, spritesheet
+  de retournement lu dans les deux sens, boucle `campagne background music`,
+  motif ponctuel `OST othello island MAP1`, easter egg rare `SAD`, clic porte,
+  clic oeil, clic invalide et son de pensee. Voir `CAMPAIGN_PROLOGUE.md` pour
+  le mapping exact.
 
 ## Direction artistique retenue
 

@@ -1219,3 +1219,254 @@ Etat :
 Commit pousse :
 
 - `4532815 feat: add title mode selection`
+
+## 2026-05-21 - Correctif retrait libelles Mixage options
+
+Etat :
+
+- Repo local : CSS du panneau options modifie et documentation projet mise a
+  jour, non committe.
+- Distribution locale : build frontend `dist` regenere par `npm run build`.
+  Artefacts Tauri Windows non regeneres dans cette session.
+- Prod / release publique : non alignee, aucun push ni release effectue.
+- Validation reelle : validations automatisees et verification visuelle locale
+  effectuees. Validation manuelle dans l'application installee non effectuee.
+
+Changements effectues :
+
+- Les lignes `.volume-control` du bloc `Mixage` sont rentrees vers l'interieur
+  du panneau.
+- Les colonnes de libelle et de pourcentage ont ete legerement resserrees afin
+  de laisser les textes hors de la zone decorative du background.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm run dev -- --host 127.0.0.1` en sandbox : KO, bloque par `spawn EPERM`
+  au lancement d'esbuild/Vite.
+- `npm run dev -- --host 127.0.0.1` hors sandbox : OK,
+  `http://127.0.0.1:1420`.
+- Verification Chrome headless via DevTools Protocol : ouverture du panneau
+  options, defilement vers `Mixage`, capture visuelle du bloc audio, libelles
+  `Musique`, `Ambiance` et `UI` rentres dans la zone utile du panneau.
+
+## 2026-05-21 - Retrait des faux onglets du panneau options
+
+Etat :
+
+- Repo local : JSX/CSS du panneau options modifies et documentation projet
+  mise a jour, non committe.
+- Distribution locale : build frontend `dist` regenere par `npm run build`.
+  Artefacts Tauri Windows non regeneres dans cette session.
+- Prod / release publique : non alignee, aucun push ni release effectue.
+- Validation reelle : validations automatisees et verification visuelle locale
+  effectuees. Validation manuelle dans l'application installee non effectuee.
+
+Changements effectues :
+
+- Retrait du bandeau `.settings-tabs` compose des visuels `Affichage`,
+  `Audio`, `Gameplay` et `Commandes`.
+- Suppression des styles CSS associes aux faux onglets.
+- Ajout d'un espacement simple au-dessus de la liste des sections pour garder
+  le panneau lisible sans promettre de navigation inexistante.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm run dev -- --host 127.0.0.1` hors sandbox : OK,
+  `http://127.0.0.1:1420`.
+- Verification Chrome headless via DevTools Protocol : panneau options ouvert,
+  aucun noeud `.settings-tabs` / `.settings-tab`, texte `Commandes` absent,
+  premier bloc `Affichage` correctement positionne sous le titre.
+
+## 2026-05-21 - Cadrage campagne point & click de la porte
+
+Etat :
+
+- Repo local : documentation projet mise a jour, non committe.
+- Code : aucune implementation campagne ajoutee dans cette entree.
+- Prod / release publique : non alignee, aucun push ni release effectue.
+- Validation reelle : cadrage produit/documentaire uniquement, pas de validation
+  runtime.
+
+Decision retenue :
+
+- Le mode `Campagne` doit commencer par un prologue point & click.
+- Apres clic sur `Campagne`, l'ecran fait un fondu noir et la musique du menu
+  doit s'eteindre progressivement.
+- Le joueur arrive visuellement sur l'ile, rapproche du manoir, puis devant une
+  porte a environ un metre.
+- A cote de la porte se trouve un plateau d'Othello avec une cle dessinee.
+- Le plateau/cle sert de hotspot : le joueur clique dessus pour ouvrir un
+  plateau vu du dessus.
+- La premiere partie se joue contre "la porte". Elle doit servir de tutoriel
+  avec IA simple, pas de premier niveau difficile.
+- La victoire ouvre la porte.
+
+Non-objectifs actuels :
+
+- Pas de campagne complete multi-chapitres dans cette premiere passe.
+- Pas de narration longue ni de gros systeme de sauvegarde pour ce prologue.
+- Pas d'IA forte pour le premier adversaire.
+
+Assets a produire plus tard :
+
+- Vue basse depuis l'ile vers le manoir.
+- Vue proche de la porte avec plateau d'Othello et cle dessinee.
+- Variante porte ouverte ou entrouverte.
+- Plateau vu du dessus pour le duel contre la porte.
+- Musique specifique de seuil, ambiance de manoir/ile proche, sons de pions,
+  retournements, serrure, reaction de porte et ouverture finale.
+
+## 2026-05-21 - Specification detaillee prologue campagne ASSETS/03
+
+Etat :
+
+- Repo local : `CAMPAIGN_PROLOGUE.md` cree et sources de verite projet mises a
+  jour, non committe.
+- Code : aucune implementation campagne ajoutee dans cette entree.
+- Assets : dossier de travail `ITERATIONS VISUELLES/ASSETS/03/` inventorie,
+  non copie dans `src/assets/` dans cette entree.
+- Prod / release publique : non alignee, aucun push ni release effectue.
+- Validation reelle : documentation et inventaire uniquement, pas de validation
+  runtime.
+
+Ce qui est maintenant fige :
+
+- Flux campagne : `Campagne` -> fondu noir -> musique menu en fondu sortant ->
+  bruitage de marche + ambiance menu -> `manoir loin` quelques secondes ->
+  fondu noir -> `manoir proche` -> nouvelle musique campagne en fondu.
+- Scene point & click proche : hotspots herbes/ombre, porte, oeil, plateau a
+  droite, clics non interactifs.
+- Textes de scene :
+  - `Des bruits etranges emanent de l'ombre...`
+  - `Cette porte semble fermee par un lourd mecanisme.`
+  - `Cet oeil... mieux vaut ne pas trainer la.`
+  - `Je pense pouvoir y arriver.`
+  - `Les... LES PIONS BOUGENT TOUT SEUL !!!??`
+- Interaction plateau : clic sur le plateau a droite -> choix bas d'ecran
+  `S'approcher` / `Annuler` -> `S'approcher` ouvre le plateau vu du dessus.
+- Duel campagne : joueur contre "la porte", IA simple et pedagogique, premier
+  coup IA accompagne du texte de surprise.
+- Audio : ambiance de menu conservee, musique menu retiree, musique campagne
+  `OST othello island MAP1.mp3` lancee sur la scene proche, sons fournis maps
+  aux clics porte/oeil/invalide/pensee.
+- Interface : curseur custom visible, zones cliquables lisibles, acces options
+  propre via une icone cryptique si disponible.
+
+Fichiers inventories :
+
+- `BIG_HEAVY_DOOR WONT OPEN.wav`
+- `CLIC ON THE EYE OF THE DOOR.wav`
+- `MOUSE CLICK WRONG.wav`
+- `OST othello island MAP1.mp3`
+- `speaksound.wav`
+- `manoir loin.png`
+- `manoir proche.png`
+- `OTHELLO PLATEAU MAP1.png`
+- `PION BLANC.png`
+- `PION NOIR.png`
+- `pion_noir_vers_blanc_assets et gifs/pion_flip_00.png` a
+  `pion_flip_08.png`
+- `pion_noir_vers_blanc_assets et gifs/pion_noir_vers_blanc_animation.gif`
+- `pion_noir_vers_blanc_assets et gifs/pion_noir_vers_blanc_spritesheet.png`
+
+Note :
+
+- Les sons de marche, pion pose, retournement, reaction de porte, serrure et
+  ouverture finale restent a confirmer ou produire s'ils ne sont pas couverts
+  par les fichiers actuels.
+
+## 2026-05-21 - Premiere implementation prologue campagne
+
+Etat :
+
+- Repo local : code, assets campagne et documentation projet modifies, non
+  committes.
+- Distribution locale : build frontend `dist`, executable Windows, MSI et
+  installateur NSIS regeneres en version `0.1.5`.
+- Prod / release publique : non alignee, aucun push ni release effectue.
+- Validation reelle : validations automatisees et verification navigateur
+  locale effectuees. Validation manuelle dans l'application installee non
+  effectuee.
+
+Changements effectues :
+
+- Copie des assets retenus de `ITERATIONS VISUELLES/ASSETS/03/` vers
+  `src/assets/campaign/` : vues manoir, plateau MAP1, pions, frames/spritesheet
+  de retournement, sons de porte/oeil/clic invalide/pensee, boucle campagne,
+  motif `OST othello island MAP1` et easter egg `SAD`.
+- Ajout d'un ecran `campaign` avec sous-etats `approach`, `door` et `board`.
+- Le clic `Campagne` eteint la musique menu en fondu, affiche `manoir loin`,
+  puis `manoir proche`.
+- Scene point & click proche : hotspots herbes, porte, oeil, plateau a droite,
+  clics non interactifs et dialogues courts avec les fonds/typos deja utilises
+  dans les options.
+- Clic plateau : choix `S'approcher` / `Annuler`, puis ouverture du plateau
+  campagne vu du dessus.
+- Duel tutoriel contre "la porte" : joueur noir, porte blanche automatique,
+  IA simple qui joue legalement apres un court delai, message de surprise au
+  premier coup IA.
+- Audio campagne corrige selon retour utilisateur : seule
+  `campagne background music.mp3.mp3` boucle ; `OST othello island MAP1.mp3`
+  est un motif non boucle ; `SAD.mp3` est declenche tres rarement sur clic
+  invalide. La boucle campagne demarre au debut du fichier, pas a un offset
+  aleatoire.
+- Animation de retournement : le spritesheet noir vers blanc est joue dans le
+  sens normal pour la porte et en sens inverse pour les flips blanc vers noir.
+- Mini-menu campagne via icone `settings_icon_controls.png` : `Parametres`,
+  `Sauvegarder` desactive, `Menu`. Le panneau parametres existant est reutilise.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK, assets campagne presents dans `dist`.
+- `npm run dev -- --host 127.0.0.1` en sandbox : KO, bloque par `spawn EPERM`
+  au lancement d'esbuild/Vite.
+- `npm run dev -- --host 127.0.0.1` hors sandbox : OK,
+  `http://127.0.0.1:1420`.
+- Chrome headless local via DevTools Protocol : parcours verifie en `1600x900`.
+  Etats controles : ecran titre present, choix `Campagne` present, scene porte
+  chargee, 4 hotspots presents, mini-menu campagne present, textes porte/oeil/
+  herbes corrects, choix `S'approcher / Annuler` visible, plateau campagne
+  charge avec 64 cases et 4 pions initiaux, premier coup joueur suivi d'un coup
+  automatique de la porte et du message
+  `Les... LES PIONS BOUGENT TOUT SEUL !!!??`.
+- Verification mini-menu campagne : `Parametres` ouvre le panneau options,
+  `Sauvegarder` est desactive, `Menu` est disponible, faux onglets options
+  toujours absents.
+- Apres ajout de l'animation inverse blanc vers noir : `npm run lint`,
+  `npm test` et `npm run build` relances, tous OK.
+- Verification Chrome headless supplementaire : apres un coup joueur, une case
+  retournee recoit `is-flipping-dark` et utilise le spritesheet
+  `pion-dark-to-light-spritesheet.png` en sens inverse ; la porte repond
+  ensuite avec le message de surprise attendu.
+- Le doublon non utilise `src/assets/campaign/music-map1.mp3` a ete retire
+  apres verification qu'aucun import ne l'utilisait. `npm run build` relance
+  ensuite : OK.
+- Apres ajustement pour faire demarrer la boucle campagne au debut du fichier :
+  `npm run lint` OK et `npm run build` OK.
+- `npm run tauri build` : OK, executable Windows et installateurs `0.1.5`
+  regeneres.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`
+
+Limites connues :
+
+- Pas de bruitage de marche distinct trouve dans les assets actuels.
+- Pas encore de sons dedies pion pose, serrure ou porte ouverte.
+- La victoire affiche un message de mecanisme qui cede, mais aucune image ou
+  animation de porte ouverte n'est encore integree.
+- Rendu exact des hotspots et du plateau a valider a l'oeil dans l'application
+  installee.
+- Installateur regenere mais non installe/reteste manuellement dans cette
+  session.

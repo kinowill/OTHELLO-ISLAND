@@ -27,6 +27,12 @@ public signe. Il reste un projet personnel.
 - L'accueil ouvre maintenant un choix de mode avant l'entree en partie :
   `Campagne` ou `Multijoueur local`, puis applique un fondu noir avant de
   charger le plateau.
+- Le mode `Campagne` charge maintenant un premier prologue jouable : fondu
+  depuis le menu, approche du manoir, scene point & click devant la porte,
+  hotspots herbes/porte/oeil/plateau, choix `S'approcher` / `Annuler`, puis
+  duel Othello tutoriel contre "la porte" avec IA simple.
+- Les artefacts Windows `0.1.5` ont ete regeneres localement apres integration
+  du prologue campagne : executable, MSI et installateur NSIS.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
   ambiance sonore, coups possibles, mixage separe musique / ambiance / UI,
   lueurs de panneau.
@@ -38,6 +44,12 @@ public signe. Il reste un projet personnel.
   d'affichage, version installable passee a `0.1.5`, footer image restaure,
   curseur 32-bit personnalise restaure, textes internes du panneau options
   retires et icone audio utilisee pour le bloc Mixage.
+- Correctif options du 2026-05-21 : les libelles de volume du bloc Mixage ont
+  ete rentres dans le panneau et les sliders legerement resserres pour eviter
+  le chevauchement avec la texture decorative. Le bandeau d'onglets decoratifs
+  `Affichage / Audio / Gameplay / Commandes` a aussi ete retire car il ne
+  declenchait aucune navigation et promettait une section `Commandes`
+  inexistante.
 - Les deux backgrounds du panneau settings (`idle` et `glow`) ont ete
   reintegres depuis les exports modifies de l'utilisateur le 2026-05-20, puis
   les artefacts Windows `0.1.5` ont ete regeneres.
@@ -65,11 +77,17 @@ Structure actuelle :
 - `MASTER.md` : source principale de verite projet.
 - `ROADMAP.md` : backlog et etapes de travail.
 - `VALIDATION.md` : journal des validations reelles.
+- `CAMPAIGN_PROLOGUE.md` : specification detaillee du premier prologue
+  campagne point & click devant le manoir.
 - `src/` : application React et logique Othello.
 - `src/assets/audio/` : assets audio versionnes pour l'ambiance d'accueil et
   les sons UI.
+- `src/assets/campaign/` : assets versionnes du prologue campagne : vues
+  manoir, plateau MAP1, pions, animation de retournement, musique de fond,
+  motif MAP1, easter egg SAD et sons de scene.
 - `src/assets/title/` : assets PNG versionnes pour l'ecran d'accueil.
-- `src/audio/titleAudio.ts` : controleur Web Audio de l'accueil.
+- `src/audio/titleAudio.ts` : controleur Web Audio de l'accueil et du
+  prologue campagne.
 - `src/game/othello.ts` : moteur de regles Othello.
 - `src/game/othello.test.ts` : tests unitaires des regles.
 - `src-tauri/` : configuration et code Tauri pour packaging PC.
@@ -109,9 +127,13 @@ Structure actuelle :
   proposent aussi un vrai plein ecran et un retour en fenetre fixe `1600x900`.
   Un mode scale/letterbox pourra remplacer cette contrainte plus tard si le
   support de petits ecrans devient prioritaire.
-- Le choix de mode de l'accueil est une preparation produit : `Multijoueur
-  local` correspond au plateau jouable actuel. `Campagne` est visible comme
-  entree d'interface, mais son contenu dedie reste a cadrer et implementer.
+- Le choix de mode de l'accueil separe `Multijoueur local` et `Campagne`.
+  `Multijoueur local` correspond au plateau classique existant. `Campagne`
+  lance le prologue point & click decrit dans `CAMPAIGN_PROLOGUE.md` : fondu
+  noir, extinction progressive de la musique du menu, approche du manoir, vue
+  proche de la porte, hotspots courts, acces options via icone, puis plateau
+  Othello MAP1. Le joueur joue noir contre "la porte" en blanc. L'IA de la
+  porte joue legalement mais reste volontairement simple et pedagogique.
 - Les appels Tauri de gestion de fenetre doivent etre autorises dans
   `src-tauri/capabilities/default.json`. Sans ces permissions, les boutons de
   mode d'affichage peuvent ne rien changer dans l'application desktop.
@@ -137,6 +159,12 @@ Structure actuelle :
   exposent trois volumes : musique, ambiance et UI. Le mix par defaut met la
   musique a 90% et l'ambiance a 60%. Le mixage reste a valider a l'oreille
   dans l'application installee.
+- Audio campagne : la musique menu sort en fondu au lancement de `Campagne`.
+  La seule boucle musicale de campagne est
+  `campagne background music.mp3.mp3`. `OST othello island MAP1.mp3` est un
+  motif ponctuel non boucle pendant le plateau, et `SAD.mp3` est reserve a un
+  declenchement tres rare type easter egg. L'ambiance ocean/vent du menu reste
+  active comme fond sonore.
 - Les boutons grises ne doivent pas declencher de son de hover.
 - Les assets visuels importants pourront etre crees separement par
   l'utilisateur via generation d'image, puis integres au projet quand leur role
@@ -150,7 +178,11 @@ Structure actuelle :
   raccourci bureau pointe son `IconLocation` vers ce fichier versionne, afin
   d'eviter que le cache Explorer reutilise l'ancienne icone liee a
   `othello-island.exe,0`.
-- Piste future a cadrer : ajouter une couche d'histoire ou de secret a
-  debloquer, et faire evoluer l'ambiance pendant la partie via lumiere,
-  textures et details de decor. Les textures importantes seront generees plus
-  tard par l'utilisateur avec GPT Image, puis integrees comme assets locaux.
+- Piste future : etendre la campagne apres la premiere porte, ajouter une
+  couche d'histoire ou de secret a debloquer, et faire evoluer l'ambiance
+  pendant la partie via lumiere, textures et details de decor. Les textures
+  importantes seront generees plus tard par l'utilisateur avec GPT Image, puis
+  integrees comme assets locaux. Pour le prologue, les assets de travail
+  fournis vivent dans `ITERATIONS VISUELLES/ASSETS/03/`, les assets retenus
+  sont copies dans `src/assets/campaign/`, et le mapping exact est documente
+  dans `CAMPAIGN_PROLOGUE.md`.

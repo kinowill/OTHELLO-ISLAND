@@ -1656,46 +1656,13 @@ button:disabled {
     brightness(1.12);
 }
 
-.settings-tabs {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin: 0 0 12px;
-  padding: 0 2px;
-}
-
-.settings-tab {
-  min-height: 42px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.25));
-}
-
-.settings-tab-display {
-  background-image: url("./assets/settings/settings_tab_display.png");
-}
-
-.settings-tab-audio {
-  background-image: url("./assets/settings/settings_tab_audio.png");
-}
-
-.settings-tab-gameplay {
-  background-image: url("./assets/settings/settings_tab_gameplay.png");
-}
-
-.settings-tab-controls {
-  background-image: url("./assets/settings/settings_tab_controls.png");
-}
-
 .settings-list {
   position: relative;
   z-index: 1;
   display: grid;
   gap: 12px;
   max-height: min(59vh, 530px);
+  margin-top: 14px;
   padding: 2px 8px 10px;
   overflow: auto;
   scrollbar-color: rgba(235, 182, 74, 0.7) rgba(0, 0, 0, 0.3);
@@ -1814,9 +1781,10 @@ button:disabled {
 
 .volume-control {
   display: grid;
-  grid-template-columns: 108px 1fr 54px;
+  grid-template-columns: 96px 1fr 50px;
   gap: 12px;
   align-items: center;
+  margin: 0 18px 0 24px;
   color: var(--ash);
   font-family: "Trebuchet MS", Verdana, sans-serif;
   font-size: 0.9rem;
@@ -2477,6 +2445,428 @@ h1 {
   outline-offset: 3px;
 }
 
+.campaign-shell {
+  height: 100vh;
+  overflow: hidden;
+  padding: 0;
+  background: #000;
+}
+
+.campaign-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-width: 1600px;
+  min-height: 900px;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+  image-rendering: pixelated;
+}
+
+.campaign-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.18;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.06) 0,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  mix-blend-mode: overlay;
+}
+
+.campaign-scene {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+.campaign-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 42%, transparent 36%, rgba(0, 0, 0, 0.48) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.44));
+}
+
+.campaign-scene-far,
+.campaign-scene-door {
+  background-size: 100% 100%;
+}
+
+.campaign-scene-far {
+  background-image: url("./assets/campaign/manor-far.png");
+  animation: campaignFarDrift 3600ms ease-in-out both;
+}
+
+.campaign-scene-far::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #000;
+  animation: campaignApproachFade 3600ms ease-in-out both;
+}
+
+.campaign-scene-door {
+  background-image: url("./assets/campaign/manor-close.png");
+  animation: campaignRevealFromBlack 880ms ease-out both;
+}
+
+.campaign-scene-board {
+  background-color: #000;
+  background-image: url("./assets/campaign/board-map1.png");
+  background-position: center;
+  background-size: 100% auto;
+  animation: campaignRevealFromBlack 640ms ease-out both;
+}
+
+.campaign-wrong-surface,
+.campaign-hotspot,
+.campaign-board-cell,
+.campaign-menu-button,
+.campaign-choice-action,
+.campaign-menu-entry {
+  font: inherit;
+}
+
+.campaign-wrong-surface,
+.campaign-hotspot {
+  position: absolute;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  color: transparent;
+  background: transparent;
+}
+
+.campaign-wrong-surface {
+  inset: 0;
+}
+
+.campaign-hotspot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  border: 2px solid rgba(235, 182, 74, 0.72);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(235, 182, 74, 0.16), transparent 54%);
+  box-shadow:
+    inset 0 0 18px rgba(235, 182, 74, 0.18),
+    0 0 18px rgba(235, 182, 74, 0.18);
+  transition: opacity 120ms steps(3);
+}
+
+.campaign-hotspot:hover::after,
+.campaign-hotspot:focus-visible::after {
+  opacity: 1;
+}
+
+.campaign-hotspot:focus-visible,
+.campaign-board-cell:focus-visible,
+.campaign-choice-action:focus-visible,
+.campaign-menu-entry:focus-visible,
+.campaign-menu-button:focus-visible {
+  outline: 2px solid rgba(242, 217, 145, 0.84);
+  outline-offset: 3px;
+}
+
+.hotspot-shadow {
+  left: 2.5%;
+  top: 52%;
+  width: 27%;
+  height: 40%;
+}
+
+.hotspot-door {
+  left: 34.5%;
+  top: 16%;
+  width: 24%;
+  height: 66%;
+}
+
+.hotspot-eye {
+  left: 45.2%;
+  top: 31%;
+  width: 5.9%;
+  height: 12%;
+}
+
+.hotspot-board {
+  left: 62.2%;
+  top: 43%;
+  width: 25%;
+  height: 35%;
+}
+
+.campaign-menu-button {
+  position: absolute;
+  top: 26px;
+  right: 34px;
+  z-index: 10;
+  width: 78px;
+  height: 78px;
+  padding: 0;
+  border: 0;
+  color: transparent;
+  background:
+    url("./assets/settings/settings_button_empty_medium_idle.png") center / 100% 100% no-repeat;
+  filter:
+    drop-shadow(0 8px 0 rgba(0, 0, 0, 0.36))
+    drop-shadow(0 0 18px rgba(235, 182, 74, 0.12));
+  image-rendering: pixelated;
+}
+
+.campaign-menu-button span {
+  position: absolute;
+  inset: 19px;
+  background: url("./assets/settings/settings_icon_controls.png") center / contain no-repeat;
+}
+
+.campaign-menu-button:hover,
+.campaign-menu-button:focus-visible,
+.campaign-menu-button[aria-expanded="true"] {
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+}
+
+.campaign-menu-button:active {
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_02.png");
+}
+
+.campaign-quick-menu {
+  position: absolute;
+  top: 116px;
+  right: 34px;
+  z-index: 11;
+  width: 280px;
+  display: grid;
+  gap: 8px;
+  padding: 24px 26px;
+  background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
+  filter:
+    drop-shadow(0 12px 0 rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 22px rgba(235, 182, 74, 0.12));
+}
+
+.campaign-menu-entry,
+.campaign-choice-action {
+  min-height: 58px;
+  border: 0;
+  color: var(--wax);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.86rem;
+  font-variant: small-caps;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.92);
+  background: url("./assets/settings/settings_button_empty_medium_idle.png") center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+}
+
+.campaign-menu-entry:not(:disabled):hover,
+.campaign-menu-entry:not(:disabled):focus-visible,
+.campaign-choice-action:hover,
+.campaign-choice-action:focus-visible {
+  color: var(--brass);
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_01.png");
+}
+
+.campaign-menu-entry:not(:disabled):active,
+.campaign-choice-action:active {
+  background-image: url("./assets/settings/settings_button_empty_medium_selected_02.png");
+}
+
+.campaign-menu-entry:disabled {
+  color: rgba(156, 149, 134, 0.64);
+}
+
+.campaign-dialogue,
+.campaign-choice-panel,
+.campaign-board-hud,
+.campaign-board-actions {
+  position: absolute;
+  z-index: 9;
+  image-rendering: pixelated;
+}
+
+.campaign-dialogue {
+  left: 50%;
+  bottom: 34px;
+  width: min(820px, 72vw);
+  min-height: 104px;
+  display: grid;
+  place-items: center;
+  padding: 30px 58px;
+  transform: translateX(-50%);
+  background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
+  filter:
+    drop-shadow(0 12px 0 rgba(0, 0, 0, 0.26))
+    drop-shadow(0 0 28px rgba(235, 182, 74, 0.14));
+  animation: campaignPanelIn 180ms steps(4) both;
+}
+
+.campaign-dialogue p {
+  margin: 0;
+  color: var(--wax);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.12rem;
+  font-weight: 900;
+  line-height: 1.34;
+  text-align: center;
+  text-shadow:
+    0 3px 0 rgba(0, 0, 0, 0.88),
+    0 0 12px rgba(192, 164, 107, 0.24);
+}
+
+.campaign-choice-panel {
+  left: 50%;
+  bottom: 44px;
+  width: 540px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 28px 36px;
+  transform: translateX(-50%);
+  background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
+  filter:
+    drop-shadow(0 12px 0 rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 26px rgba(235, 182, 74, 0.12));
+  animation: campaignPanelIn 180ms steps(4) both;
+}
+
+.campaign-choice-cancel {
+  color: var(--ash);
+}
+
+.campaign-board-hud {
+  left: 34px;
+  top: 28px;
+  width: 430px;
+  min-height: 132px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 28px 34px;
+  background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 12px 0 rgba(0, 0, 0, 0.24));
+}
+
+.campaign-board-hud strong {
+  display: block;
+  color: var(--wax);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.28;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.88);
+}
+
+.campaign-score {
+  display: grid;
+  gap: 6px;
+  min-width: 116px;
+  color: var(--brass);
+  font-family: "Courier New", "Lucida Console", monospace;
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-align: right;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.82);
+}
+
+.campaign-board-grid {
+  position: absolute;
+  left: 33.85%;
+  top: 20%;
+  z-index: 4;
+  width: 32.35%;
+  height: 59.9%;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+}
+
+.campaign-board-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  color: transparent;
+  background: transparent;
+}
+
+.campaign-board-cell.playable:hover,
+.campaign-board-cell.playable:focus-visible,
+.campaign-board-cell.legal {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(235, 182, 74, 0.16), transparent 55%);
+}
+
+.campaign-disc {
+  width: 78%;
+  height: 78%;
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  filter:
+    drop-shadow(0 6px 0 rgba(0, 0, 0, 0.28))
+    drop-shadow(0 9px 14px rgba(0, 0, 0, 0.36));
+  animation: campaignDiscPlace 170ms ease-out;
+}
+
+.campaign-disc.dark {
+  background-image: url("./assets/campaign/disc-dark.png");
+}
+
+.campaign-disc.light {
+  background-image: url("./assets/campaign/disc-light.png");
+}
+
+.campaign-disc.is-flipping-light,
+.campaign-disc.is-flipping-dark {
+  background-image: url("./assets/campaign/flip-dark-to-light/pion-dark-to-light-spritesheet.png");
+  background-size: 900% 100%;
+  animation: campaignFlipDarkToLight 720ms steps(8) both;
+}
+
+.campaign-disc.is-flipping-dark {
+  animation-name: campaignFlipLightToDark;
+}
+
+.campaign-legal-dot {
+  width: 18%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(235, 182, 74, 0.86);
+  box-shadow:
+    0 0 16px rgba(235, 182, 74, 0.74),
+    0 0 0 1px rgba(5, 8, 5, 0.72);
+}
+
+.campaign-board-actions {
+  right: 36px;
+  bottom: 34px;
+  width: 230px;
+}
+
 html,
 body,
 #root,
@@ -2493,7 +2883,13 @@ input,
 .setting-choice:not(:disabled),
 .option-toggle,
 .cell.playable,
-.reset-button {
+.reset-button,
+.campaign-hotspot,
+.campaign-wrong-surface,
+.campaign-board-cell,
+.campaign-menu-button,
+.campaign-choice-action,
+.campaign-menu-entry:not(:disabled) {
   cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
 }
 
@@ -2504,13 +2900,20 @@ input:active,
 .setting-choice:not(:disabled):active,
 .option-toggle:active,
 .cell.playable:active,
-.reset-button:active {
+.reset-button:active,
+.campaign-hotspot:active,
+.campaign-wrong-surface:active,
+.campaign-board-cell:active,
+.campaign-menu-button:active,
+.campaign-choice-action:active,
+.campaign-menu-entry:not(:disabled):active {
   cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer !important;
 }
 
 button:disabled,
 .title-action:disabled,
 .setting-choice:disabled,
+.campaign-menu-entry:disabled,
 .cell,
 .cell:disabled {
   cursor: url("./assets/cursor/cursor_idle.png") 10 6, default !important;
@@ -2528,6 +2931,79 @@ button:disabled,
   to {
     opacity: 1;
     transform: scale(1) rotateY(0deg);
+  }
+}
+
+@keyframes campaignFarDrift {
+  from {
+    transform: scale(1.025);
+  }
+  to {
+    transform: scale(1.075);
+  }
+}
+
+@keyframes campaignApproachFade {
+  0% {
+    opacity: 1;
+  }
+  24%,
+  72% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes campaignRevealFromBlack {
+  from {
+    opacity: 0;
+    filter: brightness(0);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+@keyframes campaignPanelIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes campaignDiscPlace {
+  from {
+    opacity: 0.24;
+    transform: scale(0.66) rotateY(74deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+  }
+}
+
+@keyframes campaignFlipDarkToLight {
+  from {
+    background-position: 0% center;
+  }
+  to {
+    background-position: 100% center;
+  }
+}
+
+@keyframes campaignFlipLightToDark {
+  from {
+    background-position: 100% center;
+  }
+  to {
+    background-position: 0% center;
   }
 }
 

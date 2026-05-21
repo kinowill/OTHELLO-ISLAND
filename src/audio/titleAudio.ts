@@ -3,10 +3,37 @@ import windLoopUrl from "../assets/audio/amb_wind_loop_01.mp3";
 import menuMusicUrl from "../assets/audio/mus_menu_16bit_secret_island_loop.mp3";
 import hoverUrl from "../assets/audio/ui_hover_01.wav";
 import selectUrl from "../assets/audio/ui_select_01.wav";
+import campaignBackgroundUrl from "../assets/campaign/campaign-background-loop.mp3";
+import campaignStingUrl from "../assets/campaign/campaign-sting-map1.mp3";
+import doorEyeUrl from "../assets/campaign/door-eye.wav";
+import doorLockedUrl from "../assets/campaign/door-locked.wav";
+import sadEasterEggUrl from "../assets/campaign/sad-easter-egg.mp3";
+import wrongClickUrl from "../assets/campaign/click-wrong.wav";
+import speakUrl from "../assets/campaign/speak.wav";
 
-type AudioAsset = "ocean" | "wind" | "music" | "hover" | "select";
-type LoopAsset = "ocean" | "music";
-type OneShotAsset = "hover" | "select";
+type AudioAsset =
+  | "ocean"
+  | "wind"
+  | "music"
+  | "campaignBackground"
+  | "campaignSting"
+  | "sadEasterEgg"
+  | "hover"
+  | "select"
+  | "doorLocked"
+  | "doorEye"
+  | "wrongClick"
+  | "speak";
+type LoopAsset = "ocean" | "music" | "campaignBackground";
+type OneShotAsset =
+  | "hover"
+  | "select"
+  | "campaignSting"
+  | "sadEasterEgg"
+  | "doorLocked"
+  | "doorEye"
+  | "wrongClick"
+  | "speak";
 
 export type AudioMix = {
   ambience: number;
@@ -18,8 +45,15 @@ const AUDIO_URLS: Record<AudioAsset, string> = {
   ocean: oceanLoopUrl,
   wind: windLoopUrl,
   music: menuMusicUrl,
+  campaignBackground: campaignBackgroundUrl,
+  campaignSting: campaignStingUrl,
+  sadEasterEgg: sadEasterEggUrl,
   hover: hoverUrl,
   select: selectUrl,
+  doorLocked: doorLockedUrl,
+  doorEye: doorEyeUrl,
+  wrongClick: wrongClickUrl,
+  speak: speakUrl,
 };
 
 // Calibrated from ffmpeg volumedetect; source levels differ a lot.
@@ -28,8 +62,15 @@ const BASE_AUDIO_GAINS: Record<AudioAsset | "master", number> = {
   ocean: 0.76,
   wind: 0.22,
   music: 0.1,
+  campaignBackground: 0.13,
+  campaignSting: 0.09,
+  sadEasterEgg: 0.08,
   hover: 12,
   select: 0.55,
+  doorLocked: 0.68,
+  doorEye: 0.62,
+  wrongClick: 0.72,
+  speak: 0.78,
 };
 
 const DEFAULT_MIX: AudioMix = {
@@ -75,8 +116,7 @@ export class TitleAudioController {
   private buffers = new Map<AudioAsset, AudioBuffer>();
   private context: AudioContext | null = null;
   private enabled = true;
-  private lastHoverAt = 0;
-  private lastSelectAt = 0;
+  private lastOneShotAt = new Map<OneShotAsset, number>();
   private loading: Promise<void> | null = null;
   private loopNodes = new Map<LoopAsset, LoopNode>();
   private masterGain: GainNode | null = null;
@@ -93,6 +133,7 @@ export class TitleAudioController {
 
     this.updateLoopGain("ocean");
     this.updateLoopGain("music");
+    this.updateLoopGain("campaignBackground");
     this.updateActiveWindGain();
   }
 
@@ -122,6 +163,49 @@ export class TitleAudioController {
 
   playSelect() {
     this.playOneShot("select", 80);
+  }
+
+  playCampaignSting() {
+    this.playOneShot("campaignSting", 130_000);
+  }
+
+  playSadEasterEgg() {
+    this.playOneShot("sadEasterEgg", 180_000);
+  }
+
+  playDoorLocked() {
+    this.playOneShot("doorLocked", 120);
+  }
+
+  playDoorEye() {
+    this.playOneShot("doorEye", 120);
+  }
+
+  playWrongClick() {
+    this.playOneShot("wrongClick", 90);
+  }
+
+  playSpeak() {
+    this.playOneShot("speak", 80);
+  }
+
+  async fadeOutMenuMusic(fadeSeconds = 1.2) {
+    await this.ensureReady();
+    this.clearMusicTimer();
+    this.stopLoop("music", fadeSeconds);
+  }
+
+  async startCampaignMusic(fadeSeconds = 4) {
+    await this.unlock();
+    this.clearMusicTimer();
+    this.stopLoop("music", 0.9);
+    this.startLoop("campaignBackground", fadeSeconds);
+  }
+
+  async returnToMenuMusic(fadeSeconds = 2.8) {
+    await this.unlock();
+    this.stopLoop("campaignBackground", 1.4);
+    this.startLoop("music", fadeSeconds);
   }
 
   dispose() {
@@ -166,7 +250,12 @@ export class TitleAudioController {
   private getAssetGain(asset: AudioAsset): number {
     const baseGain = BASE_AUDIO_GAINS[asset];
 
-    if (asset === "music") {
+    if (
+      asset === "music" ||
+      asset === "campaignBackground" ||
+      asset === "campaignSting" ||
+      asset === "sadEasterEgg"
+    ) {
       return baseGain * this.mix.music;
     }
 
@@ -205,7 +294,7 @@ export class TitleAudioController {
     const context = this.context;
     const masterGain = this.masterGain;
     const buffer = this.buffers.get(asset);
-    const lastPlayedAt = asset === "hover" ? this.lastHoverAt : this.lastSelectAt;
+    const lastPlayedAt = this.lastOneShotAt.get(asset) ?? 0;
 
     if (
       !context ||
@@ -217,11 +306,7 @@ export class TitleAudioController {
       return;
     }
 
-    if (asset === "hover") {
-      this.lastHoverAt = now;
-    } else {
-      this.lastSelectAt = now;
-    }
+    this.lastOneShotAt.set(asset, now);
 
     const source = context.createBufferSource();
     const gain = context.createGain();
@@ -320,8 +405,20 @@ export class TitleAudioController {
     }, delay);
   }
 
+  private clearMusicTimer() {
+    if (this.musicTimer) {
+      window.clearTimeout(this.musicTimer);
+      this.musicTimer = null;
+    }
+  }
+
   private startLoop(asset: LoopAsset, fadeSeconds: number) {
-    if (!this.context || !this.masterGain || this.loopNodes.has(asset)) {
+    if (
+      !this.context ||
+      !this.masterGain ||
+      this.loopNodes.has(asset) ||
+      !this.enabled
+    ) {
       return;
     }
 
@@ -333,7 +430,10 @@ export class TitleAudioController {
 
     const source = this.context.createBufferSource();
     const gain = this.context.createGain();
-    const offset = randomBetween(0, Math.max(0, buffer.duration - 0.2));
+    const offset =
+      asset === "campaignBackground"
+        ? 0
+        : randomBetween(0, Math.max(0, buffer.duration - 0.2));
     const now = this.context.currentTime;
     const targetGain = this.getAssetGain(asset);
 
@@ -346,11 +446,37 @@ export class TitleAudioController {
     this.loopNodes.set(asset, { asset, gain, source });
   }
 
-  private stopAll() {
-    if (this.musicTimer) {
-      window.clearTimeout(this.musicTimer);
-      this.musicTimer = null;
+  private stopLoop(asset: LoopAsset, fadeSeconds = 0) {
+    if (!this.context) {
+      return;
     }
+
+    const node = this.loopNodes.get(asset);
+
+    if (!node) {
+      return;
+    }
+
+    this.loopNodes.delete(asset);
+    const now = this.context.currentTime;
+    node.gain.gain.cancelScheduledValues(now);
+    node.gain.gain.setValueAtTime(node.gain.gain.value, now);
+
+    if (fadeSeconds > 0) {
+      node.gain.gain.linearRampToValueAtTime(0, now + fadeSeconds);
+      node.source.stop(now + fadeSeconds + 0.05);
+    } else {
+      this.stopSource(node.source);
+    }
+
+    node.source.onended = () => {
+      node.source.disconnect();
+      node.gain.disconnect();
+    };
+  }
+
+  private stopAll() {
+    this.clearMusicTimer();
 
     if (this.windTimer) {
       window.clearTimeout(this.windTimer);
