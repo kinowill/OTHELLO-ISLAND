@@ -1562,3 +1562,21 @@ Limites connues :
 - Application installee non retestee manuellement apres ces correctifs.
 - Image/animation de porte ouverte non encore fournie.
 - Son dedie de serrure/ouverture finale non encore fourni.
+
+## 2026-05-22 - Push GitHub correctifs campagne MAP1
+
+Etat :
+
+- Repo local : commit `e94d336` cree sur `main`.
+- GitHub : commit `e94d336` pousse sur `origin/main`.
+- Distribution locale : executable Windows, MSI et installateur NSIS `0.1.5`
+  regeneres avant push.
+- Prod / release publique : code source pousse, mais aucun installateur n'a ete
+  publie comme GitHub Release.
+- Validation reelle : validations automatisees, verification Chrome headless
+  locale et build Tauri effectues avant push. Validation manuelle de
+  l'application installee non effectuee.
+
+Commit pousse :
+
+- `e94d336 fix: stabilize campaign prologue flow`
