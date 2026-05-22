@@ -1470,3 +1470,21 @@ Limites connues :
   installee.
 - Installateur regenere mais non installe/reteste manuellement dans cette
   session.
+
+## 2026-05-22 - Push GitHub prologue campagne
+
+Etat :
+
+- Repo local : commit `2337e01` cree sur `main`.
+- GitHub : commit `2337e01` pousse sur `origin/main`.
+- Distribution locale : executable Windows, MSI et installateur NSIS `0.1.5`
+  regeneres avant push.
+- Prod / release publique : code source pousse, mais aucun installateur n'a ete
+  publie comme GitHub Release.
+- Validation reelle : validations automatisees, verification navigateur locale
+  et build Tauri effectues avant push. Validation manuelle de l'application
+  installee non effectuee.
+
+Commit pousse :
+
+- `2337e01 feat: add campaign prologue`
