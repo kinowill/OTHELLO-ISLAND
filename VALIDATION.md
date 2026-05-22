@@ -1488,3 +1488,77 @@ Etat :
 Commit pousse :
 
 - `2337e01 feat: add campaign prologue`
+
+## 2026-05-22 - Correctifs retour campagne MAP1
+
+Etat :
+
+- Repo local : code, assets campagne, configuration Tauri et documentation
+  projet modifies, non committes.
+- Distribution locale : build frontend `dist`, executable Windows, MSI et
+  installateur NSIS `0.1.5` regeneres localement.
+- Prod / release publique : non alignee, aucun push ni release effectue dans
+  cette entree.
+- Validation reelle : validations automatisees et verification navigateur
+  locale effectuees. Validation manuelle dans l'application installee non
+  effectuee.
+
+Retour utilisateur traite :
+
+- Curseur custom qui disparaissait sur le dialogue ou les bords de scene.
+- Hotspots point & click visibles par defaut ou au hover.
+- Musique d'accueil qui pouvait redemarrer pendant la campagne.
+- Hotspot de l'oeil mal place.
+- Assets campagne trop petits / ecrases, notamment manoir loin et plateau MAP1.
+- Nouveaux sons `footsteps-walking-boots-.mp3` et `PION SOUND.wav` a integrer.
+- Demarrage par defaut en vrai plein ecran.
+- Clignotement au changement entre animation de retournement et asset de pion.
+- Textes et comportement de fin MAP1 : defaite rejouable sans reafficher le
+  texte de surprise, victoire qui bloque le plateau depuis la porte.
+
+Changements effectues :
+
+- `manoir loin.png` agrandi remplace dans `src/assets/campaign/manor-far.png`.
+- Ajout de `footsteps-walking-boots.mp3` et `pion-sound.wav`.
+- Ajout de l'option `Zones cliquables` et du maintien de la touche `V` pour
+  afficher les hotspots. Les hotspots restent invisibles par defaut et au
+  hover.
+- Curseur custom force sur la scene campagne, les dialogues et les bords.
+- Controleur audio modifie pour interdire la boucle musicale d'accueil tant
+  que la campagne est active.
+- Plateau MAP1 passe en `cover`, grille recadree, bouton `Reculer` agrandi.
+- Hotspot oeil recentre sur le symbole de la porte.
+- Animation de retournement rendue en surcouche pour eviter le flash lors du
+  retour a l'asset fixe.
+- Etat campagne enrichi : partie MAP1 deja lancee, resultat annonce, porte
+  deverrouillee apres victoire.
+- Mode d'affichage par defaut passe en `fullscreen` et `tauri.conf.json`
+  declare la fenetre fullscreen au lancement.
+
+Commandes/verifications effectuees :
+
+- `git diff --check` : OK.
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm run tauri build` : OK, executable Windows et installateurs `0.1.5`
+  regeneres.
+- Verification Chrome headless via DevTools Protocol en viewport `1600x900` :
+  ecran titre vers campagne, porte chargee, hotspots invisibles par defaut,
+  touche `V` active la classe `campaign-hotspots-visible`, hotspot oeil mesure
+  autour du symbole, plateau MAP1 charge avec 64 cases et 4 coups jouables,
+  bouton `Reculer` mesure a `300x66`, curseur custom present sur dialogue et
+  scene, premier coup joueur suivi du coup automatique de la porte et du texte
+  `Les... LES PIONS BOUGENT TOUT SEUL !!!??`.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`
+
+Limites connues :
+
+- Application installee non retestee manuellement apres ces correctifs.
+- Image/animation de porte ouverte non encore fournie.
+- Son dedie de serrure/ouverture finale non encore fourni.

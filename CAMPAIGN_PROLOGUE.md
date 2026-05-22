@@ -21,6 +21,20 @@ Etat implementation 2026-05-21 :
 - Build frontend valide.
 - Executable, MSI et installateur NSIS Windows `0.1.5` regeneres localement.
 
+Correctif implementation 2026-05-22 :
+
+- Vue `manoir loin` remplacee par l'export agrandi `5000x3000`.
+- Sons `footsteps-walking-boots-.mp3` et `PION SOUND.wav` copies dans
+  `src/assets/campaign/` et utilises pendant l'approche / les coups MAP1.
+- Hotspots point & click masques par defaut et au survol. Ils s'affichent
+  seulement via l'option `Zones cliquables` ou pendant le maintien de la touche
+  `V`.
+- Musique d'accueil verrouillee au menu : elle ne redemarre plus pendant la
+  campagne apres un clic ou un deblocage audio.
+- Victoire / defaite MAP1 mieux separees : defaite avec retour possible vers le
+  plateau sans rejouer le texte de surprise ; victoire qui bloque le plateau
+  depuis la scene porte.
+
 ## Intention
 
 La campagne commence comme une scene point & click courte. Le joueur arrive sur
@@ -37,11 +51,10 @@ scene jouable, lisible et forte.
 1. Le joueur clique sur `Campagne` dans le menu de mode.
 2. La musique du menu disparait en fondu.
 3. Fondu au noir.
-4. Ambiance existante du menu. Le bruitage de marche reste a fournir ou
-   identifier.
+4. Ambiance existante du menu et bruitage de marche.
 5. Fondu vers `manoir loin.png` pendant quelques secondes maximum.
 6. Fondu au noir.
-7. Continuation courte du bruitage de marche quand un son dedie sera fourni.
+7. Continuation courte du bruitage de marche pendant la transition.
 8. Fondu vers `manoir proche.png`.
 9. La boucle `campagne background music.mp3.mp3` apparait en fondu.
 10. Le curseur custom redevient visible et la scene devient cliquable.
@@ -56,8 +69,12 @@ scene jouable, lisible et forte.
 16. Le joueur commence la partie tutoriel.
 17. Au premier coup joue par l'IA / la porte, le joueur est surpris :
     `Les... LES PIONS BOUGENT TOUT SEUL !!!??`
-18. Le joueur gagne la partie.
-19. La porte s'ouvre ou se deverrouille. L'etape suivante reste a cadrer.
+18. Si le joueur perd, afficher `...j'ai perdu...`. Il peut reculer puis revenir
+    sur le plateau sans reinitialiser la partie ni rejouer le texte de surprise.
+19. Si le joueur gagne, afficher `J'ai gagne ! La porte emet un son...`.
+20. Apres victoire, le retour a la porte bloque le plateau : cliquer dessus
+    affiche seulement `J'ai gagne cette partie, la porte a emis un son.`.
+21. La porte ouverte ou entrouverte reste a cadrer visuellement.
 
 ## Scene point & click
 
@@ -67,8 +84,7 @@ scene jouable, lisible et forte.
 - Role : transition d'approche depuis l'ile vers le manoir.
 - Duree : quelques secondes maximum.
 - Interactions : aucune dans la premiere version.
-- Audio : ambiance de menu. Pas de musique menu. Le bruitage de marche dedie
-  reste a fournir.
+- Audio : ambiance de menu, pas de musique menu, bruitage de marche dedie.
 
 ### Image `manoir proche`
 
@@ -93,6 +109,8 @@ Les textes doivent rester courts, sobres et cryptiques.
   `Cet oeil... mieux vaut ne pas trainer la.`
 - Clic sur le plateau a droite :
   afficher un choix bas d'ecran : `S'approcher` / `Annuler`.
+- Apres victoire MAP1, clic sur le plateau :
+  `J'ai gagne cette partie, la porte a emis un son.`
 - Clic non interactif :
   jouer le son de clic invalide, sans dialogue obligatoire.
 
@@ -155,6 +173,9 @@ Role :
 - Version actuelle : le spritesheet est joue dans le sens normal pour noir vers
   blanc et en sens inverse pour blanc vers noir. Aucun second asset n'est donc
   necessaire pour cette premiere passe.
+- Depuis le correctif du 2026-05-22, le spritesheet est rendu en surcouche
+  au-dessus du pion final pour eviter le clignotement au moment ou l'asset fixe
+  reprend la main.
 
 ## IA / tutoriel
 
@@ -188,6 +209,8 @@ Non-objectifs :
 
 - Utiliser la meme ambiance que le menu pour l'ocean / fond sonore.
 - Ne pas reutiliser la musique du menu dans la scene proche.
+- Le controleur audio interdit explicitement la boucle musicale d'accueil tant
+  que la campagne est active.
 
 ### Musique
 
@@ -224,11 +247,13 @@ Non-objectifs :
 - `speaksound.wav`
   - role : son de pensee / parole courte du joueur.
   - duree observee : environ `1s`.
+- `footsteps-walking-boots-.mp3`
+  - role : marche pendant l'approche du manoir.
+- `PION SOUND.wav`
+  - role : son de pion pose pendant les coups du joueur et de la porte.
 
 Sons encore a identifier ou produire si absents :
 
-- pas / marche pendant les transitions ;
-- pion pose ;
 - pion retourne ;
 - reaction de la porte quand elle joue ;
 - serrure / ouverture finale.
@@ -238,7 +263,10 @@ Sons encore a identifier ou produire si absents :
 ### Curseur
 
 - Le curseur custom doit rester visible sur `manoir proche`.
-- Le pointeur doit clairement indiquer les zones cliquables.
+- Le curseur custom doit rester visible sur les bords de scene et les dialogues.
+- Les hotspots ne doivent pas etre visibles par defaut ni au hover.
+- L'option `Zones cliquables` et la touche `V` servent a les afficher pour
+  inspection ou aide ponctuelle.
 
 ### Options / menu campagne
 
@@ -268,6 +296,8 @@ Fichiers principaux :
 - `ITERATIONS VISUELLES/ASSETS/03/CLIC ON THE EYE OF THE DOOR.wav`
 - `ITERATIONS VISUELLES/ASSETS/03/MOUSE CLICK WRONG.wav`
 - `ITERATIONS VISUELLES/ASSETS/03/speaksound.wav`
+- `ITERATIONS VISUELLES/ASSETS/03/footsteps-walking-boots-.mp3`
+- `ITERATIONS VISUELLES/ASSETS/03/PION SOUND.wav`
 
 Frames / animation :
 
@@ -308,7 +338,8 @@ Frames / animation :
 Etat de ce plan au 2026-05-21 :
 
 - Etapes 1 a 10 realisees pour une premiere version locale.
-- Sons de marche, pion pose distinct, serrure et ouverture finale restent a
-  produire ou identifier.
-- La victoire affiche actuellement un message de mecanisme qui cede ; la vraie
-  image/animation de porte ouverte reste a cadrer.
+- Sons de marche et pion pose distinct integres le 2026-05-22.
+- Sons de retournement, serrure et ouverture finale restent a produire ou
+  identifier.
+- La victoire affiche maintenant un retour court et bloque le plateau depuis la
+  scene porte ; la vraie image/animation de porte ouverte reste a cadrer.

@@ -22,8 +22,8 @@ public signe. Il reste un projet personnel.
   entree dans le jeu, bouton parametres et reprise de partie.
 - Ecran d'accueil remplace par des assets PNG 32-bit fournis par l'utilisateur :
   fond nocturne, logo, panneau de menu, boutons et footer.
-- Accueil compose sur une base `1600x900`, avec mode par defaut en plein
-  ecran fenetre sans bordure applique au lancement.
+- Accueil compose sur une base `1600x900`, avec mode par defaut en vrai plein
+  ecran applique au lancement.
 - L'accueil ouvre maintenant un choix de mode avant l'entree en partie :
   `Campagne` ou `Multijoueur local`, puis applique un fondu noir avant de
   charger le plateau.
@@ -31,6 +31,13 @@ public signe. Il reste un projet personnel.
   depuis le menu, approche du manoir, scene point & click devant la porte,
   hotspots herbes/porte/oeil/plateau, choix `S'approcher` / `Annuler`, puis
   duel Othello tutoriel contre "la porte" avec IA simple.
+- Correctif campagne du 2026-05-22 : les zones cliquables ne sont plus
+  visibles par defaut ni au survol, une option `Zones cliquables` et le maintien
+  de la touche `V` permettent de les afficher, le curseur custom reste actif
+  sur les dialogues et les bords de scene, la musique d'accueil ne peut plus
+  redemarrer pendant la campagne, le hotspot de l'oeil est recentre, le plateau
+  MAP1 est recadre, les nouveaux sons de marche et de pion sont integres, et
+  la victoire MAP1 bloque le plateau avec un texte de retour.
 - Les artefacts Windows `0.1.5` ont ete regeneres localement apres integration
   du prologue campagne : executable, MSI et installateur NSIS.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
@@ -123,10 +130,10 @@ Structure actuelle :
   ile lointaine, lumiere suspecte, ponton, damier au premier plan et menu a
   gauche.
 - L'accueil desktop est compose pour une base `1600x900`. Le mode par defaut
-  applique au runtime est le plein ecran fenetre sans bordure. Les parametres
-  proposent aussi un vrai plein ecran et un retour en fenetre fixe `1600x900`.
-  Un mode scale/letterbox pourra remplacer cette contrainte plus tard si le
-  support de petits ecrans devient prioritaire.
+  applique au runtime et dans la configuration Tauri est le vrai plein ecran.
+  Les parametres proposent aussi un plein ecran fenetre sans bordure et un
+  retour en fenetre fixe `1600x900`. Un mode scale/letterbox pourra remplacer
+  cette contrainte plus tard si le support de petits ecrans devient prioritaire.
 - Le choix de mode de l'accueil separe `Multijoueur local` et `Campagne`.
   `Multijoueur local` correspond au plateau classique existant. `Campagne`
   lance le prologue point & click decrit dans `CAMPAIGN_PROLOGUE.md` : fondu
@@ -164,7 +171,9 @@ Structure actuelle :
   `campagne background music.mp3.mp3`. `OST othello island MAP1.mp3` est un
   motif ponctuel non boucle pendant le plateau, et `SAD.mp3` est reserve a un
   declenchement tres rare type easter egg. L'ambiance ocean/vent du menu reste
-  active comme fond sonore.
+  active comme fond sonore. Depuis le correctif du 2026-05-22, le controleur
+  audio interdit explicitement la boucle musicale d'accueil tant que la campagne
+  est active, meme apres un nouveau clic ou une reprise du contexte audio.
 - Les boutons grises ne doivent pas declencher de son de hover.
 - Les assets visuels importants pourront etre crees separement par
   l'utilisateur via generation d'image, puis integres au projet quand leur role

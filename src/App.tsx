@@ -57,9 +57,10 @@ const CAMPAIGN_MESSAGES = {
   eye: "Cet oeil... mieux vaut ne pas trainer la.",
   approachBoard: "Je pense pouvoir y arriver.",
   firstDoorMove: "Les... LES PIONS BOUGENT TOUT SEUL !!!??",
-  darkWin: "Le mecanisme cede. La porte s'entrouvre.",
-  lightWin: "La porte resiste encore.",
-  draw: "Le mecanisme reste immobile.",
+  darkWin: "J'ai gagne ! La porte emet un son...",
+  lightWin: "...j'ai perdu...",
+  draw: "Je n'ai pas reussi a forcer le mecanisme.",
+  boardCleared: "J'ai gagne cette partie, la porte a emis un son.",
 } as const;
 
 const cellName = ({ row, col }: Position): string =>
@@ -152,6 +153,8 @@ function App() {
   const titleFadeTimerRef = useRef<number | null>(null);
   const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
   const [campaignChoiceOpen, setCampaignChoiceOpen] = useState(false);
+  const [campaignBoardStarted, setCampaignBoardStarted] = useState(false);
+  const [campaignDoorUnlocked, setCampaignDoorUnlocked] = useState(false);
   const [campaignFlippingCells, setCampaignFlippingCells] = useState<Set<string>>(
     () => new Set(),
   );
@@ -159,11 +162,13 @@ function App() {
     "dark-to-light" | "light-to-dark"
   >("dark-to-light");
   const [campaignMessage, setCampaignMessage] = useState("");
+  const [campaignResultAnnounced, setCampaignResultAnnounced] = useState(false);
+  const [campaignHotspotKeyActive, setCampaignHotspotKeyActive] = useState(false);
   const [campaignQuickMenuOpen, setCampaignQuickMenuOpen] = useState(false);
   const [campaignScene, setCampaignScene] =
     useState<CampaignScene>("approach");
   const [doorHasMoved, setDoorHasMoved] = useState(false);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>("borderless");
+  const [displayMode, setDisplayMode] = useState<DisplayMode>("fullscreen");
   const [screen, setScreen] = useState<Screen>("menu");
   const [gameMode, setGameMode] = useState<GameMode>("local");
   const [game, setGame] = useState<GameState>(() => createInitialGame());
@@ -173,12 +178,14 @@ function App() {
   const [titleFading, setTitleFading] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [showLegalMoves, setShowLegalMoves] = useState(false);
+  const [showCampaignHotspots, setShowCampaignHotspots] = useState(false);
   const legalMoves = useMemo(
     () => getLegalMoves(game.board, game.currentPlayer),
     [game.board, game.currentPlayer],
   );
   const score = useMemo(() => countDiscs(game.board), [game.board]);
   const lead = score.dark - score.light;
+  const campaignHotspotsVisible = showCampaignHotspots || campaignHotspotKeyActive;
 
   useEffect(() => {
     const controller = new TitleAudioController();
@@ -216,6 +223,40 @@ function App() {
   }, [displayMode]);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "v" || event.repeat) {
+        return;
+      }
+
+      if (screen !== "campaign" || settingsOpen) {
+        return;
+      }
+
+      setCampaignHotspotKeyActive(true);
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === "v") {
+        setCampaignHotspotKeyActive(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [screen, settingsOpen]);
+
+  useEffect(() => {
+    if (screen !== "campaign") {
+      setCampaignHotspotKeyActive(false);
+    }
+  }, [screen]);
+
+  useEffect(() => {
     return () => {
       if (campaignApproachTimerRef.current) {
         window.clearTimeout(campaignApproachTimerRef.current);
@@ -243,6 +284,7 @@ function App() {
     setCampaignMessage("");
     setCampaignChoiceOpen(false);
     setCampaignQuickMenuOpen(false);
+    audioControllerRef.current?.playFootsteps();
 
     if (campaignApproachTimerRef.current) {
       window.clearTimeout(campaignApproachTimerRef.current);
@@ -309,7 +351,7 @@ function App() {
         setCampaignFlippingCells(new Set());
       }, CAMPAIGN_FLIP_DURATION_MS);
 
-      audioControllerRef.current?.playDoorLocked();
+      audioControllerRef.current?.playPionSound();
 
       if (!doorHasMoved) {
         setDoorHasMoved(true);
@@ -329,7 +371,12 @@ function App() {
   }, [campaignScene, doorHasMoved, game, screen]);
 
   useEffect(() => {
-    if (screen !== "campaign" || campaignScene !== "board" || !game.winner) {
+    if (
+      screen !== "campaign" ||
+      campaignScene !== "board" ||
+      !game.winner ||
+      campaignResultAnnounced
+    ) {
       return;
     }
 
@@ -340,9 +387,15 @@ function App() {
           ? CAMPAIGN_MESSAGES.lightWin
           : CAMPAIGN_MESSAGES.draw;
 
+    setCampaignResultAnnounced(true);
+
+    if (game.winner === "dark") {
+      setCampaignDoorUnlocked(true);
+    }
+
     setCampaignMessage(message);
     audioControllerRef.current?.playDoorLocked();
-  }, [campaignScene, game.winner, screen]);
+  }, [campaignResultAnnounced, campaignScene, game.winner, screen]);
 
   const playHoverSound = () => {
     audioControllerRef.current?.playHover();
@@ -432,32 +485,52 @@ function App() {
       setCampaignFlippingCells(new Set());
     }, CAMPAIGN_FLIP_DURATION_MS);
 
-    playSelectSound();
+    audioControllerRef.current?.playPionSound();
     setGame(next);
   };
 
   const beginCampaignBoard = () => {
     playSelectSound();
+    if (campaignDoorUnlocked) {
+      setCampaignChoiceOpen(false);
+      showCampaignThought(CAMPAIGN_MESSAGES.boardCleared);
+      return;
+    }
+
     setCampaignChoiceOpen(false);
     setCampaignScene("board");
     setGameMode("campaign");
-    setGame(createInitialGame());
-    setDoorHasMoved(false);
     setCampaignFlippingCells(new Set());
     setCampaignQuickMenuOpen(false);
-    audioControllerRef.current?.playCampaignSting();
-    showCampaignThought(CAMPAIGN_MESSAGES.approachBoard);
+
+    if (!campaignBoardStarted) {
+      setGame(createInitialGame());
+      setDoorHasMoved(false);
+      setCampaignResultAnnounced(false);
+      setCampaignBoardStarted(true);
+      audioControllerRef.current?.playCampaignSting();
+      showCampaignThought(CAMPAIGN_MESSAGES.approachBoard);
+      return;
+    }
+
+    if (game.winner === "light") {
+      setCampaignMessage(CAMPAIGN_MESSAGES.lightWin);
+    } else if (game.winner === "draw") {
+      setCampaignMessage(CAMPAIGN_MESSAGES.draw);
+    } else {
+      setCampaignMessage("");
+    }
   };
 
   const resetCampaignScene = () => {
     playSelectSound();
     setCampaignChoiceOpen(false);
-    setCampaignMessage("");
     setCampaignQuickMenuOpen(false);
     setCampaignScene("door");
-    setGame(createInitialGame());
-    setDoorHasMoved(false);
     setCampaignFlippingCells(new Set());
+    setCampaignMessage(
+      campaignDoorUnlocked ? CAMPAIGN_MESSAGES.boardCleared : "",
+    );
     void audioControllerRef.current
       ?.startCampaignMusic(2.2)
       .catch(() => undefined);
@@ -500,6 +573,9 @@ function App() {
       setGame(createInitialGame());
       setHasStartedGame(true);
       setDoorHasMoved(false);
+      setCampaignBoardStarted(false);
+      setCampaignDoorUnlocked(false);
+      setCampaignResultAnnounced(false);
       setCampaignFlippingCells(new Set());
       setCampaignChoiceOpen(false);
       setCampaignMessage("");
@@ -683,7 +759,7 @@ function App() {
                 type="checkbox"
               />
               <span aria-hidden="true" />
-              <em>Audio du menu</em>
+              <em>Audio</em>
             </label>
 
             <label className="option-toggle">
@@ -697,6 +773,19 @@ function App() {
               />
               <span aria-hidden="true" />
               <em>Afficher les coups</em>
+            </label>
+
+            <label className="option-toggle">
+              <input
+                checked={showCampaignHotspots}
+                onChange={(event) => {
+                  playSelectSound();
+                  setShowCampaignHotspots(event.target.checked);
+                }}
+                type="checkbox"
+              />
+              <span aria-hidden="true" />
+              <em>Zones cliquables</em>
             </label>
           </div>
 
@@ -867,6 +956,12 @@ function App() {
         className="campaign-hotspot hotspot-board"
         onClick={() => {
           playSelectSound();
+          if (campaignDoorUnlocked) {
+            setCampaignChoiceOpen(false);
+            showCampaignThought(CAMPAIGN_MESSAGES.boardCleared);
+            return;
+          }
+
           setCampaignChoiceOpen(true);
           setCampaignMessage("");
         }}
@@ -1018,7 +1113,9 @@ function App() {
     return (
       <main className="app-shell campaign-shell">
         <section
-          className={`campaign-stage campaign-stage-${campaignScene}`}
+          className={`campaign-stage campaign-stage-${campaignScene}${
+            campaignHotspotsVisible ? " campaign-hotspots-visible" : ""
+          }`}
           aria-label="Campagne Othello Island"
         >
           {campaignScene === "approach" ? (

@@ -72,11 +72,16 @@ identite visuelle, audio et premiere experience installee.
 - [x] Fournir les premiers assets campagne dans `ITERATIONS VISUELLES/ASSETS/03`
   : vues manoir, plateau, pions, animation de retournement, musique et sons.
 - [x] Copier les assets campagne retenus dans `src/assets/`.
-- [ ] Completer ou produire les sons absents : marche, pion pose, retournement,
-  reaction de porte, serrure et ouverture finale si les sons fournis ne
-  suffisent pas.
+- [x] Integrer les sons campagne ajoutes le 2026-05-22 : pas de marche et son
+  de pion pose.
+- [ ] Completer ou produire les sons encore absents : retournement, reaction de
+  porte, serrure et ouverture finale si les sons fournis ne suffisent pas.
 - [x] Implementer la scene point & click de campagne et le hotspot du plateau.
 - [x] Implementer le duel tutoriel contre la porte avec IA simple.
+- [x] Corriger le premier retour campagne : curseur custom stable, hotspots
+  masques par defaut, touche `V` et option de debug visuel, musique d'accueil
+  isolee, hotspot oeil recentre, plateau MAP1 recadre, et fin victoire/defaite
+  mieux geree.
 - [ ] Cadrer la couche histoire / secret a debloquer apres la premiere porte.
 - [ ] Cadrer les textures evolutives et changements d'ambiance pendant la
   partie.
@@ -129,10 +134,11 @@ identite visuelle, audio et premiere experience installee.
 - Assets d'accueil et kit de parametres 32-bit integres. Les autres textures de
   jeu restent a definir et integrer.
 - Mode responsive/letterbox non implemente : la version courante privilegie une
-  base `1600x900` avec mode plein ecran fenetre sans bordure par defaut,
-  plus options vrai plein ecran et fenetre fixe. Les permissions Tauri ont ete
-  corrigees le 2026-05-20, mais ces modes sont encore a retester dans
-  l'application installee.
+  base `1600x900` avec vrai plein ecran par defaut, plus options plein ecran
+  fenetre sans bordure et fenetre fixe. Les permissions Tauri ont ete corrigees
+  le 2026-05-20 et le build Tauri accepte la configuration fullscreen du
+  2026-05-22, mais ces modes sont encore a retester dans l'application
+  installee.
 - Aucun blocage packaging connu apres correction Windows et ajout des icones.
 - Release publique non publiee : les artefacts existent localement, mais ne
   sont pas encore livres via GitHub Release ou autre canal.
@@ -165,14 +171,14 @@ identite visuelle, audio et premiere experience installee.
   entrouverte ou ouverte, plateau vu du dessus pour le duel contre la porte.
 - Audio campagne prioritaire :
   musique specifique du seuil, ambiance de manoir/ile proche, fondu de sortie
-  de la musique menu, sons de pion pose, retournement, reaction de la porte,
-  serrure et ouverture finale.
+  de la musique menu, sons de marche, sons de pion pose, retournement, reaction
+  de la porte, serrure et ouverture finale.
 - Les assets `ASSETS/03` retenus sont copies dans `src/assets/campaign/` :
   manoir loin, manoir proche, plateau campagne, pions noir/blanc, spritesheet
   de retournement lu dans les deux sens, boucle `campagne background music`,
   motif ponctuel `OST othello island MAP1`, easter egg rare `SAD`, clic porte,
-  clic oeil, clic invalide et son de pensee. Voir `CAMPAIGN_PROLOGUE.md` pour
-  le mapping exact.
+  clic oeil, clic invalide, son de pensee, pas de marche et son de pion pose.
+  Voir `CAMPAIGN_PROLOGUE.md` pour le mapping exact.
 
 ## Direction artistique retenue
 

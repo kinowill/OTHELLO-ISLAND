@@ -7,6 +7,8 @@ import campaignBackgroundUrl from "../assets/campaign/campaign-background-loop.m
 import campaignStingUrl from "../assets/campaign/campaign-sting-map1.mp3";
 import doorEyeUrl from "../assets/campaign/door-eye.wav";
 import doorLockedUrl from "../assets/campaign/door-locked.wav";
+import footstepsUrl from "../assets/campaign/footsteps-walking-boots.mp3";
+import pionSoundUrl from "../assets/campaign/pion-sound.wav";
 import sadEasterEggUrl from "../assets/campaign/sad-easter-egg.mp3";
 import wrongClickUrl from "../assets/campaign/click-wrong.wav";
 import speakUrl from "../assets/campaign/speak.wav";
@@ -22,6 +24,8 @@ type AudioAsset =
   | "select"
   | "doorLocked"
   | "doorEye"
+  | "footsteps"
+  | "pionSound"
   | "wrongClick"
   | "speak";
 type LoopAsset = "ocean" | "music" | "campaignBackground";
@@ -32,6 +36,8 @@ type OneShotAsset =
   | "sadEasterEgg"
   | "doorLocked"
   | "doorEye"
+  | "footsteps"
+  | "pionSound"
   | "wrongClick"
   | "speak";
 
@@ -52,6 +58,8 @@ const AUDIO_URLS: Record<AudioAsset, string> = {
   select: selectUrl,
   doorLocked: doorLockedUrl,
   doorEye: doorEyeUrl,
+  footsteps: footstepsUrl,
+  pionSound: pionSoundUrl,
   wrongClick: wrongClickUrl,
   speak: speakUrl,
 };
@@ -69,6 +77,8 @@ const BASE_AUDIO_GAINS: Record<AudioAsset | "master", number> = {
   select: 0.55,
   doorLocked: 0.68,
   doorEye: 0.62,
+  footsteps: 0.74,
+  pionSound: 0.58,
   wrongClick: 0.72,
   speak: 0.78,
 };
@@ -120,6 +130,7 @@ export class TitleAudioController {
   private loading: Promise<void> | null = null;
   private loopNodes = new Map<LoopAsset, LoopNode>();
   private masterGain: GainNode | null = null;
+  private menuMusicAllowed = true;
   private mix: AudioMix = DEFAULT_MIX;
   private musicTimer: number | null = null;
   private windTimer: number | null = null;
@@ -181,6 +192,14 @@ export class TitleAudioController {
     this.playOneShot("doorEye", 120);
   }
 
+  playFootsteps() {
+    this.playOneShot("footsteps", 500);
+  }
+
+  playPionSound() {
+    this.playOneShot("pionSound", 80);
+  }
+
   playWrongClick() {
     this.playOneShot("wrongClick", 90);
   }
@@ -190,12 +209,14 @@ export class TitleAudioController {
   }
 
   async fadeOutMenuMusic(fadeSeconds = 1.2) {
+    this.menuMusicAllowed = false;
     await this.ensureReady();
     this.clearMusicTimer();
     this.stopLoop("music", fadeSeconds);
   }
 
   async startCampaignMusic(fadeSeconds = 4) {
+    this.menuMusicAllowed = false;
     await this.unlock();
     this.clearMusicTimer();
     this.stopLoop("music", 0.9);
@@ -203,7 +224,9 @@ export class TitleAudioController {
   }
 
   async returnToMenuMusic(fadeSeconds = 2.8) {
+    this.menuMusicAllowed = true;
     await this.unlock();
+    this.clearMusicTimer();
     this.stopLoop("campaignBackground", 1.4);
     this.startLoop("music", fadeSeconds);
   }
@@ -226,7 +249,14 @@ export class TitleAudioController {
 
     await this.resumeContext();
     this.startLoop("ocean", AMBIENCE_FADE_IN_SECONDS);
-    this.scheduleMusic();
+
+    if (this.menuMusicAllowed) {
+      this.scheduleMusic();
+    } else {
+      this.clearMusicTimer();
+      this.stopLoop("music", 0.5);
+    }
+
     this.scheduleWind();
   }
 
@@ -259,7 +289,7 @@ export class TitleAudioController {
       return baseGain * this.mix.music;
     }
 
-    if (asset === "ocean" || asset === "wind") {
+    if (asset === "ocean" || asset === "wind" || asset === "footsteps") {
       return baseGain * this.mix.ambience;
     }
 
@@ -382,7 +412,12 @@ export class TitleAudioController {
   }
 
   private scheduleMusic() {
-    if (this.loopNodes.has("music") || this.musicTimer || !this.enabled) {
+    if (
+      this.loopNodes.has("music") ||
+      this.musicTimer ||
+      !this.enabled ||
+      !this.menuMusicAllowed
+    ) {
       return;
     }
 
