@@ -12,6 +12,8 @@ import pionSoundUrl from "../assets/campaign/pion-sound.wav";
 import sadEasterEggUrl from "../assets/campaign/sad-easter-egg.mp3";
 import wrongClickUrl from "../assets/campaign/click-wrong.wav";
 import speakUrl from "../assets/campaign/speak.wav";
+import hallDropletsUrl from "../assets/campaign/hall-droplets.mp3";
+import hallWindUrl from "../assets/campaign/hall-cave-wind.mp3";
 
 type AudioAsset =
   | "ocean"
@@ -19,6 +21,8 @@ type AudioAsset =
   | "music"
   | "campaignBackground"
   | "campaignSting"
+  | "hallDroplets"
+  | "hallWind"
   | "sadEasterEgg"
   | "hover"
   | "select"
@@ -28,7 +32,12 @@ type AudioAsset =
   | "pionSound"
   | "wrongClick"
   | "speak";
-type LoopAsset = "ocean" | "music" | "campaignBackground";
+type LoopAsset =
+  | "ocean"
+  | "music"
+  | "campaignBackground"
+  | "hallDroplets"
+  | "hallWind";
 type OneShotAsset =
   | "hover"
   | "select"
@@ -53,6 +62,8 @@ const AUDIO_URLS: Record<AudioAsset, string> = {
   music: menuMusicUrl,
   campaignBackground: campaignBackgroundUrl,
   campaignSting: campaignStingUrl,
+  hallDroplets: hallDropletsUrl,
+  hallWind: hallWindUrl,
   sadEasterEgg: sadEasterEggUrl,
   hover: hoverUrl,
   select: selectUrl,
@@ -72,6 +83,8 @@ const BASE_AUDIO_GAINS: Record<AudioAsset | "master", number> = {
   music: 0.1,
   campaignBackground: 0.13,
   campaignSting: 0.09,
+  hallDroplets: 0.34,
+  hallWind: 0.2,
   sadEasterEgg: 0.08,
   hover: 12,
   select: 0.55,
@@ -90,8 +103,8 @@ const DEFAULT_MIX: AudioMix = {
 };
 
 const AMBIENCE_FADE_IN_SECONDS = 5.2;
-const MUSIC_START_DELAY_MS = 4_500;
-const MUSIC_FADE_IN_SECONDS = 7.5;
+const MUSIC_START_DELAY_MS = 0;
+const MUSIC_FADE_IN_SECONDS = 4.2;
 const WIND_DELAY_RANGE_MS = [7_000, 21_000] as const;
 const WIND_DURATION_RANGE_SECONDS = [13, 31] as const;
 const WIND_FADE_IN_SECONDS = 2.4;
@@ -133,6 +146,7 @@ const getAudioContextConstructor = () =>
 
 export class TitleAudioController {
   private activeWind: WindNode | null = null;
+  private ambienceMode: "exterior" | "hall" = "exterior";
   private buffers = new Map<AudioAsset, AudioBuffer>();
   private context: AudioContext | null = null;
   private enabled = true;
@@ -156,6 +170,8 @@ export class TitleAudioController {
     this.updateLoopGain("ocean");
     this.updateLoopGain("music");
     this.updateLoopGain("campaignBackground");
+    this.updateLoopGain("hallDroplets");
+    this.updateLoopGain("hallWind");
     this.updateActiveWindGain();
   }
 
@@ -227,6 +243,7 @@ export class TitleAudioController {
   }
 
   async fadeOutMenuMusic(fadeSeconds = 1.2) {
+    this.ambienceMode = "exterior";
     this.menuMusicAllowed = false;
     await this.ensureReady();
     this.clearMusicTimer();
@@ -234,19 +251,46 @@ export class TitleAudioController {
   }
 
   async startCampaignMusic(fadeSeconds = 4) {
+    this.ambienceMode = "exterior";
     this.menuMusicAllowed = false;
     await this.unlock();
     this.clearMusicTimer();
+    this.stopLoop("hallDroplets", 1.2);
+    this.stopLoop("hallWind", 1.2);
     this.stopLoop("music", 0.9);
     this.startLoop("campaignBackground", fadeSeconds);
   }
 
+  async startHallAmbience(fadeSeconds = 3) {
+    this.ambienceMode = "hall";
+    this.menuMusicAllowed = false;
+    await this.ensureReady();
+    await this.resumeContext();
+
+    if (!this.enabled) {
+      return;
+    }
+
+    this.clearMusicTimer();
+    this.clearWindTimer();
+    this.stopCampaignSting(0.8);
+    this.stopLoop("music", 0.8);
+    this.stopLoop("campaignBackground", 1.5);
+    this.stopLoop("ocean", 1.2);
+    this.stopActiveWind(1);
+    this.startLoop("hallDroplets", fadeSeconds);
+    this.startLoop("hallWind", fadeSeconds + 0.4);
+  }
+
   async returnToMenuMusic(fadeSeconds = 2.8) {
+    this.ambienceMode = "exterior";
     this.menuMusicAllowed = true;
     await this.unlock();
     this.clearMusicTimer();
     this.stopCampaignSting(0.8);
     this.stopLoop("campaignBackground", 1.4);
+    this.stopLoop("hallDroplets", 1.2);
+    this.stopLoop("hallWind", 1.2);
     this.startLoop("music", fadeSeconds);
   }
 
@@ -267,6 +311,20 @@ export class TitleAudioController {
     }
 
     await this.resumeContext();
+    if (this.ambienceMode === "hall") {
+      this.clearMusicTimer();
+      this.clearWindTimer();
+      this.stopLoop("music", 0.5);
+      this.stopLoop("campaignBackground", 0.5);
+      this.stopLoop("ocean", 0.5);
+      this.stopActiveWind(0.5);
+      this.startLoop("hallDroplets", 1.4);
+      this.startLoop("hallWind", 1.8);
+      return;
+    }
+
+    this.stopLoop("hallDroplets", 1);
+    this.stopLoop("hallWind", 1);
     this.startLoop("ocean", AMBIENCE_FADE_IN_SECONDS);
 
     if (this.menuMusicAllowed) {
@@ -308,7 +366,13 @@ export class TitleAudioController {
       return baseGain * this.mix.music;
     }
 
-    if (asset === "ocean" || asset === "wind" || asset === "footsteps") {
+    if (
+      asset === "ocean" ||
+      asset === "wind" ||
+      asset === "hallDroplets" ||
+      asset === "hallWind" ||
+      asset === "footsteps"
+    ) {
       return baseGain * this.mix.ambience;
     }
 
@@ -456,7 +520,12 @@ export class TitleAudioController {
   }
 
   private playWindGust() {
-    if (!this.context || !this.masterGain || !this.enabled) {
+    if (
+      !this.context ||
+      !this.masterGain ||
+      !this.enabled ||
+      this.ambienceMode !== "exterior"
+    ) {
       return;
     }
 
@@ -533,7 +602,12 @@ export class TitleAudioController {
   }
 
   private scheduleWind() {
-    if (this.windTimer || this.activeWind || !this.enabled) {
+    if (
+      this.windTimer ||
+      this.activeWind ||
+      !this.enabled ||
+      this.ambienceMode !== "exterior"
+    ) {
       return;
     }
 
@@ -549,6 +623,13 @@ export class TitleAudioController {
     if (this.musicTimer) {
       window.clearTimeout(this.musicTimer);
       this.musicTimer = null;
+    }
+  }
+
+  private clearWindTimer() {
+    if (this.windTimer) {
+      window.clearTimeout(this.windTimer);
+      this.windTimer = null;
     }
   }
 
@@ -618,10 +699,7 @@ export class TitleAudioController {
   private stopAll() {
     this.clearMusicTimer();
 
-    if (this.windTimer) {
-      window.clearTimeout(this.windTimer);
-      this.windTimer = null;
-    }
+    this.clearWindTimer();
 
     this.loopNodes.forEach(({ gain, source }) => {
       this.stopSource(source);
@@ -638,11 +716,36 @@ export class TitleAudioController {
     this.restartableOneShots.clear();
 
     if (this.activeWind) {
-      this.stopSource(this.activeWind.source);
-      this.activeWind.source.disconnect();
-      this.activeWind.gain.disconnect();
-      this.activeWind = null;
+      this.stopActiveWind();
     }
+  }
+
+  private stopActiveWind(fadeSeconds = 0) {
+    if (!this.context || !this.activeWind) {
+      return;
+    }
+
+    const node = this.activeWind;
+    const now = this.context.currentTime;
+    this.activeWind = null;
+    node.gain.gain.cancelScheduledValues(now);
+    node.gain.gain.setValueAtTime(node.gain.gain.value, now);
+
+    if (fadeSeconds > 0) {
+      node.gain.gain.linearRampToValueAtTime(0, now + fadeSeconds);
+      try {
+        node.source.stop(now + fadeSeconds + 0.05);
+      } catch {
+        // Source may already be scheduled to stop.
+      }
+    } else {
+      this.stopSource(node.source);
+    }
+
+    node.source.onended = () => {
+      node.source.disconnect();
+      node.gain.disconnect();
+    };
   }
 
   private updateActiveWindGain() {

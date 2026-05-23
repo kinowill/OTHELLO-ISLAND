@@ -1650,3 +1650,36 @@ Etat :
 Commit pousse :
 
 - `6f4a43e fix: polish campaign qa feedback`
+
+## 2026-05-23 - Integration MAP2 couloir et audio interieur
+
+Etat :
+
+- Repo local : code, assets et documentation projet modifies, non committes.
+- Distribution locale : build frontend `dist` regenere. Executable Windows,
+  MSI et installateur NSIS non regeneres dans cette entree.
+- Prod / release publique : non alignee, aucun push ni release effectue dans
+  cette entree.
+- Validation reelle : validations automatisees effectuees. Verification
+  visuelle interactive limitee : l'outil Browser integre n'a pas expose le
+  `node_repl js` necessaire ; controle de secours effectue via serveur local
+  HTTP 200, build et presence des assets compiles. Validation manuelle dans
+  l'application installee non effectuee.
+
+Retour utilisateur traite :
+
+- Curseur custom qui disparait encore aux bords de l'ecran.
+- Musique de menu attendue immediatement avec l'ambiance.
+- Pensee du joueur devant la porte, skippable.
+- Suppression du son de hover sur les hotspots point & click / fond.
+- Victoire MAP1 devant mener a MAP2 via porte/oeil, pas et fondu noir.
+- MAP2 : couloir interieur du manoir, lueurs oscillantes, ambiance gouttes /
+  souffle interieur depuis `ASSETS/04`.
+
+Commandes/verifications effectuees :
+
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `Invoke-WebRequest http://127.0.0.1:1420/` : HTTP 200.
+- Controle du build `dist` : assets MAP2 et curseurs ancres `0 0` presents.

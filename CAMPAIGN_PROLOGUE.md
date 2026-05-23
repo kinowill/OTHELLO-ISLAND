@@ -8,6 +8,7 @@ decisions dans le chat.
 Source d'assets actuelle :
 
 - `ITERATIONS VISUELLES/ASSETS/03/`
+- `ITERATIONS VISUELLES/ASSETS/04/` pour MAP2 / interieur du manoir.
 
 Ces fichiers sont des assets de travail non versionnes tant qu'ils restent dans
 `ITERATIONS VISUELLES/`. Les assets retenus pour l'application doivent etre
@@ -38,6 +39,19 @@ Correctif implementation 2026-05-22 :
   fondu, l'OST MAP1 redemarre a chaque entree/reprise du plateau et s'arrete
   quand le joueur recule, le hotspot de l'oeil est reduit, et le flip de pion
   masque le pion fixe pendant le spritesheet.
+
+Extension implementation 2026-05-23 :
+
+- La musique du menu demarre sans delai avec l'ambiance sur l'accueil.
+- Le curseur custom utilise un ancrage `0 0` et les shells principaux
+  remplissent le viewport pour eviter sa disparition aux bords.
+- La scene de porte affiche une pensee introductive skippable du joueur.
+- Les hotspots point & click ne jouent plus de son de hover : le joueur ne peut
+  plus scanner la scene uniquement a l'oreille.
+- Apres victoire MAP1, cliquer la porte ou l'oeil ne rejoue plus les anciens
+  messages : cela declenche pas + fondu noir + entree en MAP2.
+- MAP2 est integree comme couloir interieur du manoir, avec lueurs oscillantes
+  et ambiance dediee de gouttes / souffle interieur.
 
 ## Intention
 
@@ -78,7 +92,10 @@ scene jouable, lisible et forte.
 19. Si le joueur gagne, afficher `J'ai gagne ! La porte emet un son...`.
 20. Apres victoire, le retour a la porte bloque le plateau : cliquer dessus
     affiche seulement `J'ai gagne cette partie, la porte a emis un son.`.
-21. La porte ouverte ou entrouverte reste a cadrer visuellement.
+21. Apres victoire, cliquer sur la porte ou l'oeil joue un court son de pas,
+    lance un fondu noir, puis amene a MAP2.
+22. MAP2 affiche l'interieur du manoir : long couloir, nombreuses portes
+    laterales et grosse porte de fond pour un futur boss.
 
 ## Scene point & click
 
@@ -111,10 +128,14 @@ Les textes doivent rester courts, sobres et cryptiques.
   `Cette porte semble fermee par un lourd mecanisme.`
 - Clic sur l'oeil :
   `Cet oeil... mieux vaut ne pas trainer la.`
+- Pensee introductive devant la porte, skippable par clic sur le dialogue :
+  `La porte me regarde... et ce plateau n'est pas la par hasard.`
 - Clic sur le plateau a droite :
   afficher un choix bas d'ecran : `S'approcher` / `Annuler`.
 - Apres victoire MAP1, clic sur le plateau :
   `J'ai gagne cette partie, la porte a emis un son.`
+- Apres victoire MAP1, clic sur porte ou oeil :
+  pas + fondu noir + passage MAP2.
 - Clic non interactif :
   jouer le son de clic invalide, sans dialogue obligatoire.
 
@@ -263,15 +284,42 @@ Sons encore a identifier ou produire si absents :
 - reaction de la porte quand elle joue ;
 - serrure / ouverture finale.
 
+### MAP2 interieur
+
+Assets retenus :
+
+- `ITERATIONS VISUELLES/ASSETS/04/MAP inteirue manoir.png`
+  - copie versionnee : `src/assets/campaign/manor-hall-map2.png`
+  - role : premiere vue interieure du manoir apres ouverture MAP1.
+- `ITERATIONS VISUELLES/ASSETS/04/dragon-studio-droplets-in-a-cave-482871.mp3`
+  - copie versionnee : `src/assets/campaign/hall-droplets.mp3`
+  - role : gouttes / humidite interieure.
+- `ITERATIONS VISUELLES/ASSETS/04/freesound_community-cave-wind-10-76283.mp3`
+  - copie versionnee : `src/assets/campaign/hall-cave-wind.mp3`
+  - role : souffle interieur grave, remplace le vent/ocean exterieur.
+
+Intention MAP2 :
+
+- Le joueur entre dans le manoir.
+- La scene doit donner l'impression d'un couloir profond avec plusieurs portes :
+  chaque porte pourra devenir un niveau ou un secret.
+- La grosse porte au fond est gardee pour un futur boss.
+- A l'interieur, ne pas conserver l'ocean ni le vent exterieur ; utiliser les
+  deux ambiances MAP2.
+- Les lueurs des lampes oscillent legerement pour rendre la scene vivante.
+
 ## Interface
 
 ### Curseur
 
 - Le curseur custom doit rester visible sur `manoir proche`.
 - Le curseur custom doit rester visible sur les bords de scene et les dialogues.
+- Le curseur custom utilise un ancrage `0 0` pour rester visible quand la souris
+  touche les bords du viewport.
 - Les hotspots ne doivent pas etre visibles par defaut ni au hover.
 - L'option `Zones cliquables` et la touche `V` servent a les afficher pour
   inspection ou aide ponctuelle.
+- Les hotspots point & click ne doivent pas jouer de son de hover.
 
 ### Options / menu campagne
 
@@ -303,6 +351,9 @@ Fichiers principaux :
 - `ITERATIONS VISUELLES/ASSETS/03/speaksound.wav`
 - `ITERATIONS VISUELLES/ASSETS/03/footsteps-walking-boots-.mp3`
 - `ITERATIONS VISUELLES/ASSETS/03/PION SOUND.wav`
+- `ITERATIONS VISUELLES/ASSETS/04/MAP inteirue manoir.png`
+- `ITERATIONS VISUELLES/ASSETS/04/dragon-studio-droplets-in-a-cave-482871.mp3`
+- `ITERATIONS VISUELLES/ASSETS/04/freesound_community-cave-wind-10-76283.mp3`
 
 Frames / animation :
 
@@ -347,4 +398,5 @@ Etat de ce plan au 2026-05-21 :
 - Sons de retournement, serrure et ouverture finale restent a produire ou
   identifier.
 - La victoire affiche maintenant un retour court et bloque le plateau depuis la
-  scene porte ; la vraie image/animation de porte ouverte reste a cadrer.
+  scene porte ; la porte/oeil sert ensuite d'entree vers MAP2. La vraie
+  image/animation de porte ouverte reste a cadrer.

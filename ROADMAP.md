@@ -86,6 +86,9 @@ identite visuelle, audio et premiere experience installee.
   custom conserve sur `Reculer` et les bords, hotspot oeil resserre, flip de
   pion sans doublon visible, et OST MAP1 relancee a chaque entree plateau sans
   boucle.
+- [x] Ajouter la transition victoire MAP1 vers MAP2 : porte/oeil deviennent
+  une entree avec pas + fondu noir, puis couloir interieur de manoir avec
+  lueurs oscillantes et ambiance sonore dediee `ASSETS/04`.
 - [ ] Cadrer la couche histoire / secret a debloquer apres la premiere porte.
 - [ ] Cadrer les textures evolutives et changements d'ambiance pendant la
   partie.
@@ -133,6 +136,9 @@ identite visuelle, audio et premiere experience installee.
   legalement apres un court delai et choisit volontairement des coups peu
   agressifs. Son niveau reste a ajuster apres test humain.
 - Forme exacte de l'histoire / secret apres la premiere porte non definie.
+  MAP2 pose maintenant le cadre : couloir interieur avec nombreuses portes,
+  chaque porte pouvant devenir un niveau ou un secret, et grosse porte de fond
+  gardee pour un futur boss.
 - Systeme d'evolution visuelle en partie a definir : lumiere, textures,
   details de decor, et conditions de changement.
 - Assets d'accueil et kit de parametres 32-bit integres. Les autres textures de
@@ -182,7 +188,9 @@ identite visuelle, audio et premiere experience installee.
   de retournement lu dans les deux sens, boucle `campagne background music`,
   motif ponctuel `OST othello island MAP1`, easter egg rare `SAD`, clic porte,
   clic oeil, clic invalide, son de pensee, pas de marche et son de pion pose.
-  Voir `CAMPAIGN_PROLOGUE.md` pour le mapping exact.
+  Les assets `ASSETS/04` retenus ajoutent MAP2 : image du couloir interieur,
+  gouttes de grotte et souffle interieur. Voir `CAMPAIGN_PROLOGUE.md` pour le
+  mapping exact.
 
 ## Direction artistique retenue
 

@@ -43,15 +43,22 @@ public signe. Il reste un projet personnel.
   plateau puis s'arrete au retour porte, le hotspot de l'oeil est encore
   resserre, le bouton `Reculer` garde le curseur custom, et l'animation de pion
   ne laisse plus voir le pion fixe sous le spritesheet.
+- Extension campagne du 2026-05-23 : le curseur custom utilise un ancrage
+  `0 0` et les surfaces principales remplissent le viewport pour rester visible
+  aux bords, la musique du menu demarre sans delai avec l'ambiance, la porte
+  MAP1 affiche une pensee introductive skippable, les hotspots point & click ne
+  jouent plus de son de hover, et la victoire MAP1 permet d'entrer dans MAP2.
+  MAP2 est une vue interieure de manoir/couloir avec lueurs oscillantes et
+  ambiance sonore de gouttes / souffle de grotte depuis les assets `ASSETS/04`.
 - Les artefacts Windows `0.1.5` ont ete regeneres localement apres integration
   du prologue campagne : executable, MSI et installateur NSIS.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,
   ambiance sonore, coups possibles, mixage separe musique / ambiance / UI,
   lueurs de panneau.
 - Audio procedural retire apres test utilisateur negatif. Premiere integration
-  audio par assets locaux : ocean nocturne, musique menu retardee avec fade-in,
-  vent aleatoire, hover et select UI. Le mix par defaut place maintenant la
-  musique a 90% et l'ambiance a 60%.
+  audio par assets locaux : ocean nocturne, musique menu immediate avec
+  fade-in, vent aleatoire, hover et select UI. Le mix par defaut place
+  maintenant la musique a 90% et l'ambiance a 60%.
 - Correctif options du 2026-05-20 : permissions Tauri ajoutees pour les modes
   d'affichage, version installable passee a `0.1.5`, footer image restaure,
   curseur 32-bit personnalise restaure, textes internes du panneau options
@@ -96,7 +103,8 @@ Structure actuelle :
   les sons UI.
 - `src/assets/campaign/` : assets versionnes du prologue campagne : vues
   manoir, plateau MAP1, pions, animation de retournement, musique de fond,
-  motif MAP1, easter egg SAD et sons de scene.
+  motif MAP1, easter egg SAD, sons de scene, vue MAP2 interieure et ambiances
+  de couloir.
 - `src/assets/title/` : assets PNG versionnes pour l'ecran d'accueil.
 - `src/audio/titleAudio.ts` : controleur Web Audio de l'accueil et du
   prologue campagne.
@@ -165,12 +173,12 @@ Structure actuelle :
   l'utilisateur ou generes/specifies separement. Le projet ne doit pas inclure
   de contenu pirate ou redistribue sans droit dans le depot.
 - L'audio actif dans la version courante utilise des assets locaux. L'ocean
-  arrive en fade-in, la musique demarre quelques secondes apres avec fade-in,
-  le vent est relance avec delais/offsets aleatoires pour eviter une synchro
-  fixe, et les sons UI hover/select ont des gains separes. Les parametres
-  exposent trois volumes : musique, ambiance et UI. Le mix par defaut met la
-  musique a 90% et l'ambiance a 60%. Le mixage reste a valider a l'oreille
-  dans l'application installee.
+  arrive en fade-in, la musique du menu demarre maintenant immediatement avec
+  son propre fade-in, le vent est relance avec delais/offsets aleatoires pour
+  eviter une synchro fixe, et les sons UI hover/select ont des gains separes.
+  Les parametres exposent trois volumes : musique, ambiance et UI. Le mix par
+  defaut met la musique a 90% et l'ambiance a 60%. Le mixage reste a valider a
+  l'oreille dans l'application installee.
 - Audio campagne : la musique menu sort en fondu au lancement de `Campagne`.
   La seule boucle musicale de campagne est
   `campagne background music.mp3.mp3`. `OST othello island MAP1.mp3` est un
@@ -198,5 +206,6 @@ Structure actuelle :
   importantes seront generees plus tard par l'utilisateur avec GPT Image, puis
   integrees comme assets locaux. Pour le prologue, les assets de travail
   fournis vivent dans `ITERATIONS VISUELLES/ASSETS/03/`, les assets retenus
-  sont copies dans `src/assets/campaign/`, et le mapping exact est documente
-  dans `CAMPAIGN_PROLOGUE.md`.
+  vivent dans `ITERATIONS VISUELLES/ASSETS/03/` puis `ASSETS/04/` pour MAP2,
+  les assets retenus sont copies dans `src/assets/campaign/`, et le mapping
+  exact est documente dans `CAMPAIGN_PROLOGUE.md`.

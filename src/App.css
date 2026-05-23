@@ -29,9 +29,12 @@
 
 body {
   margin: 0;
+  width: 100%;
+  height: 100%;
   min-width: 320px;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
+  background: #000;
 }
 
 html,
@@ -39,7 +42,16 @@ body,
 #root,
 .app-shell,
 .asset-title-screen {
-  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto;
+  cursor: url("./assets/cursor/cursor_idle.png") 0 0, auto;
+}
+
+html,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #000;
 }
 
 button {
@@ -50,17 +62,17 @@ button,
 label,
 input,
 [role="button"] {
-  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer;
+  cursor: url("./assets/cursor/cursor_hover.png") 0 0, pointer;
 }
 
 button:active,
 input:active,
 label:active {
-  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer;
+  cursor: url("./assets/cursor/cursor_pressed.png") 0 0, pointer;
 }
 
 button:disabled {
-  cursor: url("./assets/cursor/cursor_idle.png") 10 6, default;
+  cursor: url("./assets/cursor/cursor_idle.png") 0 0, default;
 }
 
 .sr-only {
@@ -75,6 +87,7 @@ button:disabled {
 }
 
 .app-shell {
+  width: 100vw;
   min-height: 100vh;
   padding: var(--shell-pad);
   background:
@@ -101,10 +114,10 @@ button:disabled {
 
 .asset-title-screen {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  min-width: 1600px;
-  min-height: 900px;
+  min-width: 100vw;
+  min-height: 100vh;
   overflow: hidden;
   background:
     radial-gradient(circle at 70% 12%, rgba(39, 68, 112, 0.36), transparent 32%),
@@ -2446,7 +2459,12 @@ h1 {
 }
 
 .campaign-shell {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
   height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
   overflow: hidden;
   padding: 0;
   background: #000;
@@ -2454,10 +2472,10 @@ h1 {
 
 .campaign-stage {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  min-width: 1600px;
-  min-height: 900px;
+  min-width: 100vw;
+  min-height: 100vh;
   overflow: hidden;
   background: #000;
   isolation: isolate;
@@ -2528,6 +2546,37 @@ h1 {
   background-position: center;
   background-size: cover;
   animation: campaignRevealFromBlack 640ms ease-out both;
+}
+
+.campaign-scene-hall {
+  background-color: #000;
+  background-image: url("./assets/campaign/manor-hall-map2.png");
+  background-position: center;
+  background-size: cover;
+  animation: campaignRevealFromBlack 900ms ease-out both;
+}
+
+.campaign-scene-hall::before {
+  background:
+    radial-gradient(circle at 50% 43%, transparent 30%, rgba(0, 0, 0, 0.52) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.46));
+}
+
+.campaign-hall-lights {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.62;
+  background:
+    radial-gradient(circle at 20% 53%, rgba(255, 203, 91, 0.24), transparent 5%),
+    radial-gradient(circle at 28% 50%, rgba(255, 203, 91, 0.18), transparent 4.5%),
+    radial-gradient(circle at 37% 49%, rgba(255, 203, 91, 0.16), transparent 4%),
+    radial-gradient(circle at 63% 49%, rgba(255, 203, 91, 0.16), transparent 4%),
+    radial-gradient(circle at 72% 50%, rgba(255, 203, 91, 0.18), transparent 4.5%),
+    radial-gradient(circle at 80% 53%, rgba(255, 203, 91, 0.24), transparent 5%);
+  mix-blend-mode: screen;
+  animation: campaignHallFlicker 4.8s steps(1) infinite;
 }
 
 .campaign-wrong-surface,
@@ -2718,12 +2767,24 @@ h1 {
   display: grid;
   place-items: center;
   padding: 30px 58px;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: center;
   transform: translateX(-50%);
   background: url("./assets/settings/settings_section_panel_idle.png") center / 100% 100% no-repeat;
   filter:
     drop-shadow(0 12px 0 rgba(0, 0, 0, 0.26))
     drop-shadow(0 0 28px rgba(235, 182, 74, 0.14));
   animation: campaignPanelIn 180ms steps(4) both;
+}
+
+.campaign-dialogue.is-skippable:hover,
+.campaign-dialogue.is-skippable:focus-visible {
+  filter:
+    drop-shadow(0 12px 0 rgba(0, 0, 0, 0.26))
+    drop-shadow(0 0 34px rgba(235, 182, 74, 0.2))
+    brightness(1.06);
 }
 
 .campaign-dialogue p {
@@ -2892,6 +2953,15 @@ h1 {
   width: 300px;
 }
 
+.campaign-map-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  background: #000;
+  animation: campaignMapFade 1080ms ease-in forwards;
+}
+
 html,
 body,
 *,
@@ -2912,7 +2982,7 @@ body,
 .campaign-board-hud *,
 .campaign-board-actions,
 .campaign-board-actions * {
-  cursor: url("./assets/cursor/cursor_idle.png") 10 6, auto !important;
+  cursor: url("./assets/cursor/cursor_idle.png") 0 0, auto !important;
 }
 
 button:not(:disabled),
@@ -2925,12 +2995,11 @@ input,
 .cell.playable,
 .reset-button,
 .campaign-hotspot,
-.campaign-wrong-surface,
 .campaign-board-cell,
 .campaign-menu-button,
 .campaign-choice-action,
 .campaign-menu-entry:not(:disabled) {
-  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+  cursor: url("./assets/cursor/cursor_hover.png") 0 0, pointer !important;
 }
 
 button:not(:disabled):active,
@@ -2942,12 +3011,19 @@ input:active,
 .cell.playable:active,
 .reset-button:active,
 .campaign-hotspot:active,
-.campaign-wrong-surface:active,
 .campaign-board-cell:active,
 .campaign-menu-button:active,
 .campaign-choice-action:active,
 .campaign-menu-entry:not(:disabled):active {
-  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer !important;
+  cursor: url("./assets/cursor/cursor_pressed.png") 0 0, pointer !important;
+}
+
+.campaign-wrong-surface,
+.campaign-wrong-surface:hover,
+.campaign-wrong-surface:focus-visible,
+.campaign-wrong-surface:active {
+  cursor: url("./assets/cursor/cursor_idle.png") 0 0, auto !important;
+  outline: none;
 }
 
 button:disabled,
@@ -2956,21 +3032,21 @@ button:disabled,
 .campaign-menu-entry:disabled,
 .cell,
 .cell:disabled {
-  cursor: url("./assets/cursor/cursor_idle.png") 10 6, default !important;
+  cursor: url("./assets/cursor/cursor_idle.png") 0 0, default !important;
 }
 
 .cell.playable {
-  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+  cursor: url("./assets/cursor/cursor_hover.png") 0 0, pointer !important;
 }
 
 .campaign-board-actions .campaign-choice-action,
 .campaign-board-actions .campaign-choice-action:hover,
 .campaign-board-actions .campaign-choice-action:focus-visible {
-  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+  cursor: url("./assets/cursor/cursor_hover.png") 0 0, pointer !important;
 }
 
 .campaign-board-actions .campaign-choice-action:active {
-  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer !important;
+  cursor: url("./assets/cursor/cursor_pressed.png") 0 0, pointer !important;
 }
 
 @keyframes placeDisc {
@@ -3014,6 +3090,41 @@ button:disabled,
   to {
     opacity: 1;
     filter: brightness(1);
+  }
+}
+
+@keyframes campaignMapFade {
+  0% {
+    opacity: 0;
+  }
+  58%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes campaignHallFlicker {
+  0%,
+  18%,
+  21%,
+  43%,
+  47%,
+  70%,
+  100% {
+    opacity: 0.62;
+    filter: brightness(1);
+  }
+  19%,
+  44%,
+  71% {
+    opacity: 0.34;
+    filter: brightness(0.72);
+  }
+  20%,
+  46%,
+  72% {
+    opacity: 0.78;
+    filter: brightness(1.18);
   }
 }
 

@@ -20,7 +20,7 @@ import { TitleAudioController, type AudioMix } from "./audio/titleAudio";
 
 type Screen = "menu" | "game" | "campaign";
 type GameMode = "campaign" | "local";
-type CampaignScene = "approach" | "door" | "board";
+type CampaignScene = "approach" | "door" | "board" | "hall";
 type DisplayMode = "borderless" | "fullscreen" | "windowed";
 
 const DEFAULT_AUDIO_MIX: AudioMix = {
@@ -31,6 +31,7 @@ const DEFAULT_AUDIO_MIX: AudioMix = {
 
 const TITLE_FADE_DURATION_MS = 760;
 const CAMPAIGN_APPROACH_DURATION_MS = 3_600;
+const CAMPAIGN_MAP_TRANSITION_MS = 1_080;
 const DOOR_MOVE_DELAY_MS = 900;
 const CAMPAIGN_FLIP_DURATION_MS = 720;
 const SAD_EASTER_EGG_CHANCE = 0.006;
@@ -53,6 +54,7 @@ const playerLabels: Record<Player, string> = {
 
 const CAMPAIGN_MESSAGES = {
   shadow: "Des bruits etranges emanent de l'ombre...",
+  doorIntro: "La porte me regarde... et ce plateau n'est pas la par hasard.",
   door: "Cette porte semble fermee par un lourd mecanisme.",
   eye: "Cet oeil... mieux vaut ne pas trainer la.",
   approachBoard: "Je pense pouvoir y arriver.",
@@ -61,6 +63,7 @@ const CAMPAIGN_MESSAGES = {
   lightWin: "...j'ai perdu...",
   draw: "Je n'ai pas reussi a forcer le mecanisme.",
   boardCleared: "J'ai gagne cette partie, la porte a emis un son.",
+  hallIntro: "Je suis entre... chaque porte semble attendre quelque chose.",
 } as const;
 
 const cellName = ({ row, col }: Position): string =>
@@ -149,6 +152,7 @@ function App() {
   const audioControllerRef = useRef<TitleAudioController | null>(null);
   const campaignApproachTimerRef = useRef<number | null>(null);
   const campaignFlipTimerRef = useRef<number | null>(null);
+  const campaignMapTransitionTimerRef = useRef<number | null>(null);
   const doorMoveTimerRef = useRef<number | null>(null);
   const titleFadeTimerRef = useRef<number | null>(null);
   const [audioMix, setAudioMix] = useState<AudioMix>(DEFAULT_AUDIO_MIX);
@@ -162,6 +166,9 @@ function App() {
     "dark-to-light" | "light-to-dark"
   >("dark-to-light");
   const [campaignMessage, setCampaignMessage] = useState("");
+  const [campaignDoorIntroActive, setCampaignDoorIntroActive] = useState(false);
+  const [campaignDoorIntroSeen, setCampaignDoorIntroSeen] = useState(false);
+  const [campaignMapTransitioning, setCampaignMapTransitioning] = useState(false);
   const [campaignResultAnnounced, setCampaignResultAnnounced] = useState(false);
   const [campaignHotspotKeyActive, setCampaignHotspotKeyActive] = useState(false);
   const [campaignQuickMenuOpen, setCampaignQuickMenuOpen] = useState(false);
@@ -270,6 +277,10 @@ function App() {
         window.clearTimeout(campaignFlipTimerRef.current);
       }
 
+      if (campaignMapTransitionTimerRef.current) {
+        window.clearTimeout(campaignMapTransitionTimerRef.current);
+      }
+
       if (titleFadeTimerRef.current) {
         window.clearTimeout(titleFadeTimerRef.current);
       }
@@ -305,6 +316,23 @@ function App() {
       }
     };
   }, [campaignScene, screen]);
+
+  useEffect(() => {
+    if (
+      screen !== "campaign" ||
+      campaignScene !== "door" ||
+      campaignDoorIntroSeen ||
+      campaignDoorUnlocked
+    ) {
+      return;
+    }
+
+    setCampaignDoorIntroSeen(true);
+    setCampaignDoorIntroActive(true);
+    setCampaignChoiceOpen(false);
+    setCampaignMessage(CAMPAIGN_MESSAGES.doorIntro);
+    window.setTimeout(() => audioControllerRef.current?.playSpeak(), 160);
+  }, [campaignDoorIntroSeen, campaignDoorUnlocked, campaignScene, screen]);
 
   useEffect(() => {
     if (
@@ -423,7 +451,26 @@ function App() {
     onPointerEnter: playHoverSound,
   };
 
+  const skipCampaignDoorIntro = () => {
+    if (!campaignDoorIntroActive) {
+      return false;
+    }
+
+    setCampaignDoorIntroActive(false);
+    setCampaignMessage("");
+    return true;
+  };
+
+  const playCampaignSurfaceClick = () => {
+    if (skipCampaignDoorIntro()) {
+      return;
+    }
+
+    playCampaignWrongClick();
+  };
+
   const showCampaignThought = (message: string) => {
+    setCampaignDoorIntroActive(false);
     setCampaignMessage(message);
     playSpeakSound();
   };
@@ -491,6 +538,7 @@ function App() {
 
   const beginCampaignBoard = () => {
     playSelectSound();
+    setCampaignDoorIntroActive(false);
     if (campaignDoorUnlocked) {
       setCampaignChoiceOpen(false);
       showCampaignThought(CAMPAIGN_MESSAGES.boardCleared);
@@ -522,8 +570,38 @@ function App() {
     }
   };
 
+  const enterCampaignHall = () => {
+    if (campaignMapTransitioning) {
+      return;
+    }
+
+    setCampaignDoorIntroActive(false);
+    setCampaignChoiceOpen(false);
+    setCampaignQuickMenuOpen(false);
+    setCampaignMessage("");
+    setCampaignMapTransitioning(true);
+    audioControllerRef.current?.playFootsteps();
+    audioControllerRef.current?.stopCampaignSting(0.5);
+
+    if (campaignMapTransitionTimerRef.current) {
+      window.clearTimeout(campaignMapTransitionTimerRef.current);
+    }
+
+    campaignMapTransitionTimerRef.current = window.setTimeout(() => {
+      campaignMapTransitionTimerRef.current = null;
+      setCampaignScene("hall");
+      setCampaignMapTransitioning(false);
+      setCampaignMessage(CAMPAIGN_MESSAGES.hallIntro);
+      void audioControllerRef.current
+        ?.startHallAmbience(3)
+        .catch(() => undefined);
+      window.setTimeout(() => audioControllerRef.current?.playSpeak(), 240);
+    }, CAMPAIGN_MAP_TRANSITION_MS);
+  };
+
   const resetCampaignScene = () => {
     playSelectSound();
+    setCampaignDoorIntroActive(false);
     setCampaignChoiceOpen(false);
     setCampaignQuickMenuOpen(false);
     setCampaignScene("door");
@@ -576,6 +654,9 @@ function App() {
       setDoorHasMoved(false);
       setCampaignBoardStarted(false);
       setCampaignDoorUnlocked(false);
+      setCampaignDoorIntroActive(false);
+      setCampaignDoorIntroSeen(false);
+      setCampaignMapTransitioning(false);
       setCampaignResultAnnounced(false);
       setCampaignFlippingCells(new Set());
       setCampaignChoiceOpen(false);
@@ -621,9 +702,15 @@ function App() {
       setTitleFading(false);
 
       if (gameMode === "campaign" && campaignScene !== "approach") {
-        void audioControllerRef.current
-          ?.startCampaignMusic(2.4)
-          .catch(() => undefined);
+        if (campaignScene === "hall") {
+          void audioControllerRef.current
+            ?.startHallAmbience(2.6)
+            .catch(() => undefined);
+        } else {
+          void audioControllerRef.current
+            ?.startCampaignMusic(2.4)
+            .catch(() => undefined);
+        }
       }
     }, TITLE_FADE_DURATION_MS);
   };
@@ -632,6 +719,11 @@ function App() {
     playSelectSound();
     setSettingsOpen(false);
     setModeMenuOpen(false);
+    if (campaignMapTransitionTimerRef.current) {
+      window.clearTimeout(campaignMapTransitionTimerRef.current);
+      campaignMapTransitionTimerRef.current = null;
+    }
+    setCampaignMapTransitioning(false);
     if (screen === "campaign") {
       void audioControllerRef.current
         ?.returnToMenuMusic(2.8)
@@ -888,9 +980,20 @@ function App() {
   );
 
   const campaignDialogue = campaignMessage ? (
-    <div className="campaign-dialogue" role="status">
-      <p>{campaignMessage}</p>
-    </div>
+    campaignDoorIntroActive ? (
+      <button
+        aria-label="Passer la pensee"
+        className="campaign-dialogue is-skippable"
+        onClick={skipCampaignDoorIntro}
+        type="button"
+      >
+        <p>{campaignMessage}</p>
+      </button>
+    ) : (
+      <div className="campaign-dialogue" role="status">
+        <p>{campaignMessage}</p>
+      </div>
+    )
   ) : null;
 
   const campaignChoice = campaignChoiceOpen ? (
@@ -922,7 +1025,7 @@ function App() {
       <button
         aria-label="Zone non interactive"
         className="campaign-wrong-surface"
-        onClick={playCampaignWrongClick}
+        onClick={playCampaignSurfaceClick}
         type="button"
       />
       <button
@@ -930,33 +1033,47 @@ function App() {
         className="campaign-hotspot hotspot-shadow"
         onClick={() => showCampaignThought(CAMPAIGN_MESSAGES.shadow)}
         type="button"
-        {...hoverAudioProps}
       />
       <button
-        aria-label="Porte fermee"
+        aria-label={campaignDoorUnlocked ? "Entrer dans le manoir" : "Porte fermee"}
         className="campaign-hotspot hotspot-door"
         onClick={() => {
+          setCampaignDoorIntroActive(false);
+          setCampaignChoiceOpen(false);
+          if (campaignDoorUnlocked) {
+            enterCampaignHall();
+            return;
+          }
+
           audioControllerRef.current?.playDoorLocked();
           setCampaignMessage(CAMPAIGN_MESSAGES.door);
         }}
         type="button"
-        {...hoverAudioProps}
       />
       <button
-        aria-label="Oeil de la porte"
+        aria-label={
+          campaignDoorUnlocked ? "Passage du manoir" : "Oeil de la porte"
+        }
         className="campaign-hotspot hotspot-eye"
         onClick={() => {
+          setCampaignDoorIntroActive(false);
+          setCampaignChoiceOpen(false);
+          if (campaignDoorUnlocked) {
+            enterCampaignHall();
+            return;
+          }
+
           audioControllerRef.current?.playDoorEye();
           setCampaignMessage(CAMPAIGN_MESSAGES.eye);
         }}
         type="button"
-        {...hoverAudioProps}
       />
       <button
         aria-label="Plateau d'Othello avec une cle"
         className="campaign-hotspot hotspot-board"
         onClick={() => {
           playSelectSound();
+          setCampaignDoorIntroActive(false);
           if (campaignDoorUnlocked) {
             setCampaignChoiceOpen(false);
             showCampaignThought(CAMPAIGN_MESSAGES.boardCleared);
@@ -967,10 +1084,23 @@ function App() {
           setCampaignMessage("");
         }}
         type="button"
-        {...hoverAudioProps}
       />
       {campaignQuickMenu}
       {campaignChoice}
+      {campaignDialogue}
+    </div>
+  );
+
+  const campaignHallScene = (
+    <div className="campaign-scene campaign-scene-hall">
+      <button
+        aria-label="Couloir du manoir"
+        className="campaign-wrong-surface"
+        onClick={playCampaignWrongClick}
+        type="button"
+      />
+      <div className="campaign-hall-lights" aria-hidden="true" />
+      {campaignQuickMenu}
       {campaignDialogue}
     </div>
   );
@@ -1123,9 +1253,14 @@ function App() {
             <div className="campaign-scene campaign-scene-far" aria-hidden="true" />
           ) : campaignScene === "door" ? (
             campaignDoorScene
-          ) : (
+          ) : campaignScene === "board" ? (
             campaignBoardScene
+          ) : (
+            campaignHallScene
           )}
+          {campaignMapTransitioning ? (
+            <div className="campaign-map-fade" aria-hidden="true" />
+          ) : null}
         </section>
         {settingsOpen ? settingsPanel : null}
       </main>
