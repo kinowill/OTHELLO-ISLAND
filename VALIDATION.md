@@ -1632,3 +1632,21 @@ Artefacts generes :
 - `src-tauri/target/release/othello-island.exe`
 - `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
 - `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`
+
+## 2026-05-23 - Push GitHub ajustements QA campagne MAP1
+
+Etat :
+
+- Repo local : commit `6f4a43e` cree sur `main`.
+- GitHub : commit `6f4a43e` pousse sur `origin/main`.
+- Distribution locale : executable Windows, MSI et installateur NSIS `0.1.5`
+  regeneres avant push.
+- Prod / release publique : code source pousse, mais aucun installateur n'a ete
+  publie comme GitHub Release.
+- Validation reelle : validations automatisees, verification Chrome headless
+  locale et build Tauri effectues avant push. Validation manuelle de
+  l'application installee non effectuee.
+
+Commit pousse :
+
+- `6f4a43e fix: polish campaign qa feedback`
