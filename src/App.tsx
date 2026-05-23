@@ -502,13 +502,13 @@ function App() {
     setGameMode("campaign");
     setCampaignFlippingCells(new Set());
     setCampaignQuickMenuOpen(false);
+    audioControllerRef.current?.playCampaignSting();
 
     if (!campaignBoardStarted) {
       setGame(createInitialGame());
       setDoorHasMoved(false);
       setCampaignResultAnnounced(false);
       setCampaignBoardStarted(true);
-      audioControllerRef.current?.playCampaignSting();
       showCampaignThought(CAMPAIGN_MESSAGES.approachBoard);
       return;
     }
@@ -528,6 +528,7 @@ function App() {
     setCampaignQuickMenuOpen(false);
     setCampaignScene("door");
     setCampaignFlippingCells(new Set());
+    audioControllerRef.current?.stopCampaignSting();
     setCampaignMessage(
       campaignDoorUnlocked ? CAMPAIGN_MESSAGES.boardCleared : "",
     );

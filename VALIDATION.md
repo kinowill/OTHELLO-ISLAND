@@ -1580,3 +1580,55 @@ Etat :
 Commit pousse :
 
 - `e94d336 fix: stabilize campaign prologue flow`
+
+## 2026-05-22 - Ajustements QA campagne MAP1
+
+Etat :
+
+- Repo local : code et documentation projet modifies, non committes.
+- Distribution locale : build frontend `dist`, executable Windows, MSI et
+  installateur NSIS `0.1.5` regeneres localement.
+- Prod / release publique : non alignee, aucun push ni release effectue dans
+  cette entree.
+- Validation reelle : validations automatisees et verification Chrome headless
+  locale effectuees. Validation manuelle dans l'application installee non
+  effectuee.
+
+Retour utilisateur traite :
+
+- Son de pas trop long.
+- Curseur qui redevient souris native sur `Reculer` et aux bords de l'ecran.
+- Hotspot de l'oeil encore trop grand / mal centre.
+- Pions visibles en double pendant l'animation de retournement.
+- OST MAP1 attendue des l'ouverture du plateau, non bouclee, puis relancee si
+  le joueur recule et revient.
+
+Changements effectues :
+
+- Lecture du son de pas limitee a une courte duree avec fondu sortant.
+- OST MAP1 rendue redemarrable : elle repart au debut a chaque entree plateau
+  et s'arrete quand le joueur recule vers la porte.
+- Hotspot de l'oeil resserre et recentre.
+- Pendant un flip, le pion fixe est masque et seul le spritesheet est rendu.
+- Curseur custom applique globalement, puis curseurs hover/pressed reappliques
+  explicitement aux elements interactifs, dont `Reculer`.
+
+Commandes/verifications effectuees :
+
+- `git diff --check` : OK.
+- `npm run lint` : OK.
+- `npm test` : OK, 4 tests unitaires passes.
+- `npm run build` : OK.
+- `npm run tauri build` : OK, executable Windows et installateurs `0.1.5`
+  regeneres.
+- Verification Chrome headless via DevTools Protocol en viewport `1600x900` :
+  curseur custom present aux quatre bords de la scene porte, hotspot oeil
+  mesure a environ `85x74`, `Reculer` mesure a `300x66` avec curseur custom,
+  le pion en retournement a `background-image: none` et le spritesheet en
+  pseudo-element, retour porte puis reentree plateau fonctionnels.
+
+Artefacts generes :
+
+- `src-tauri/target/release/othello-island.exe`
+- `src-tauri/target/release/bundle/msi/Othello Island_0.1.5_x64_en-US.msi`
+- `src-tauri/target/release/bundle/nsis/Othello Island_0.1.5_x64-setup.exe`

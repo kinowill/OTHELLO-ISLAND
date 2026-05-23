@@ -38,6 +38,11 @@ public signe. Il reste un projet personnel.
   redemarrer pendant la campagne, le hotspot de l'oeil est recentre, le plateau
   MAP1 est recadre, les nouveaux sons de marche et de pion sont integres, et
   la victoire MAP1 bloque le plateau avec un texte de retour.
+- Correctif campagne complementaire du 2026-05-22 : le son de marche est coupe
+  court avec fondu, l'OST ponctuelle MAP1 redemarre a chaque entree/reprise du
+  plateau puis s'arrete au retour porte, le hotspot de l'oeil est encore
+  resserre, le bouton `Reculer` garde le curseur custom, et l'animation de pion
+  ne laisse plus voir le pion fixe sous le spritesheet.
 - Les artefacts Windows `0.1.5` ont ete regeneres localement apres integration
   du prologue campagne : executable, MSI et installateur NSIS.
 - Parametres enrichis et rhabilles avec un kit UI 32-bit : mode d'affichage,

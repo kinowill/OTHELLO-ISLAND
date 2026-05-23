@@ -34,6 +34,10 @@ Correctif implementation 2026-05-22 :
 - Victoire / defaite MAP1 mieux separees : defaite avec retour possible vers le
   plateau sans rejouer le texte de surprise ; victoire qui bloque le plateau
   depuis la scene porte.
+- Ajustement suivant : le son de marche est limite a une courte duree avec
+  fondu, l'OST MAP1 redemarre a chaque entree/reprise du plateau et s'arrete
+  quand le joueur recule, le hotspot de l'oeil est reduit, et le flip de pion
+  masque le pion fixe pendant le spritesheet.
 
 ## Intention
 
@@ -64,8 +68,8 @@ scene jouable, lisible et forte.
 13. `S'approcher` ouvre directement le plateau d'Othello vu du dessus avec
     `OTHELLO PLATEAU MAP1.png`.
 14. Le texte de pensee apparait : `Je pense pouvoir y arriver.`
-15. Le motif `OST othello island MAP1.mp3` peut etre joue ponctuellement, non
-    boucle, pendant la partie.
+15. Le motif `OST othello island MAP1.mp3` demarre a chaque entree sur le
+    plateau. Il ne boucle pas ; quand il se termine, seule l'ambiance reste.
 16. Le joueur commence la partie tutoriel.
 17. Au premier coup joue par l'IA / la porte, le joueur est surpris :
     `Les... LES PIONS BOUGENT TOUT SEUL !!!??`
@@ -225,8 +229,8 @@ Non-objectifs :
   - asset : `ITERATIONS VISUELLES/ASSETS/03/OST othello island MAP1.mp3`
   - duree observee : environ `149.68s`.
   - ne doit pas boucler.
-  - version actuelle : joue comme motif ponctuel au lancement du plateau
-    campagne, avec un throttle long pour eviter les empilements.
+  - version actuelle : joue des que le plateau campagne s'ouvre, repart du
+    debut si le joueur recule puis revient, et s'arrete au retour porte.
 - Easter egg :
   - asset : `ITERATIONS VISUELLES/ASSETS/03/SAD.mp3`
   - duree observee : environ `182.05s`.
@@ -248,7 +252,8 @@ Non-objectifs :
   - role : son de pensee / parole courte du joueur.
   - duree observee : environ `1s`.
 - `footsteps-walking-boots-.mp3`
-  - role : marche pendant l'approche du manoir.
+  - role : marche courte pendant l'approche du manoir.
+  - implementation : lecture limitee a environ deux secondes avec fondu sortant.
 - `PION SOUND.wav`
   - role : son de pion pose pendant les coups du joueur et de la porte.
 

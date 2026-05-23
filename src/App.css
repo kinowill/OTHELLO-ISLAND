@@ -2603,10 +2603,10 @@ h1 {
 }
 
 .hotspot-eye {
-  left: 43.8%;
-  top: 42.4%;
-  width: 8.6%;
-  height: 13.2%;
+  left: 45.2%;
+  top: 39.5%;
+  width: 5.3%;
+  height: 8.2%;
 }
 
 .hotspot-board {
@@ -2862,6 +2862,7 @@ h1 {
 
 .campaign-disc.is-flipping-light,
 .campaign-disc.is-flipping-dark {
+  background-image: none;
   animation: none;
 }
 
@@ -2893,6 +2894,9 @@ h1 {
 
 html,
 body,
+*,
+*::before,
+*::after,
 #root,
 .app-shell,
 .asset-title-screen,
@@ -2957,6 +2961,16 @@ button:disabled,
 
 .cell.playable {
   cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+}
+
+.campaign-board-actions .campaign-choice-action,
+.campaign-board-actions .campaign-choice-action:hover,
+.campaign-board-actions .campaign-choice-action:focus-visible {
+  cursor: url("./assets/cursor/cursor_hover.png") 10 6, pointer !important;
+}
+
+.campaign-board-actions .campaign-choice-action:active {
+  cursor: url("./assets/cursor/cursor_pressed.png") 10 8, pointer !important;
 }
 
 @keyframes placeDisc {

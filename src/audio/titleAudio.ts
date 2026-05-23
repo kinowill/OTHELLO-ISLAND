@@ -110,6 +110,16 @@ type WindNode = {
   source: AudioBufferSourceNode;
 };
 
+type OneShotNode = {
+  gain: GainNode;
+  source: AudioBufferSourceNode;
+};
+
+type OneShotOptions = {
+  durationSeconds?: number;
+  fadeOutSeconds?: number;
+};
+
 type WindowWithWebkitAudio = Window &
   typeof globalThis & {
     webkitAudioContext?: typeof AudioContext;
@@ -133,6 +143,7 @@ export class TitleAudioController {
   private menuMusicAllowed = true;
   private mix: AudioMix = DEFAULT_MIX;
   private musicTimer: number | null = null;
+  private restartableOneShots = new Map<OneShotAsset, OneShotNode>();
   private windTimer: number | null = null;
 
   setMix(mix: AudioMix) {
@@ -177,7 +188,11 @@ export class TitleAudioController {
   }
 
   playCampaignSting() {
-    this.playOneShot("campaignSting", 130_000);
+    void this.playRestartableOneShot("campaignSting");
+  }
+
+  stopCampaignSting(fadeSeconds = 0.45) {
+    this.stopRestartableOneShot("campaignSting", fadeSeconds);
   }
 
   playSadEasterEgg() {
@@ -193,7 +208,10 @@ export class TitleAudioController {
   }
 
   playFootsteps() {
-    this.playOneShot("footsteps", 500);
+    this.playOneShot("footsteps", 500, {
+      durationSeconds: 2.15,
+      fadeOutSeconds: 0.55,
+    });
   }
 
   playPionSound() {
@@ -227,6 +245,7 @@ export class TitleAudioController {
     this.menuMusicAllowed = true;
     await this.unlock();
     this.clearMusicTimer();
+    this.stopCampaignSting(0.8);
     this.stopLoop("campaignBackground", 1.4);
     this.startLoop("music", fadeSeconds);
   }
@@ -313,7 +332,11 @@ export class TitleAudioController {
     return this.loading;
   }
 
-  private playOneShot(asset: OneShotAsset, throttleMs: number) {
+  private playOneShot(
+    asset: OneShotAsset,
+    throttleMs: number,
+    options: OneShotOptions = {},
+  ) {
     if (!this.enabled) {
       return;
     }
@@ -337,17 +360,99 @@ export class TitleAudioController {
     }
 
     this.lastOneShotAt.set(asset, now);
+    this.createOneShotNode(asset, options);
+  }
+
+  private async playRestartableOneShot(
+    asset: OneShotAsset,
+    options: OneShotOptions = {},
+  ) {
+    if (!this.enabled) {
+      return;
+    }
+
+    await this.unlock();
+    this.stopRestartableOneShot(asset, 0.12);
+
+    const node = this.createOneShotNode(asset, options);
+
+    if (node) {
+      this.restartableOneShots.set(asset, node);
+    }
+  }
+
+  private createOneShotNode(
+    asset: OneShotAsset,
+    options: OneShotOptions = {},
+  ): OneShotNode | null {
+    const context = this.context;
+    const masterGain = this.masterGain;
+    const buffer = this.buffers.get(asset);
+
+    if (!context || !masterGain || !buffer || context.state !== "running") {
+      return null;
+    }
 
     const source = context.createBufferSource();
     const gain = context.createGain();
-    gain.gain.value = this.getAssetGain(asset);
+    const now = context.currentTime;
+    const durationSeconds = Math.min(
+      options.durationSeconds ?? buffer.duration,
+      buffer.duration,
+    );
+    const fadeOutSeconds = Math.max(
+      0,
+      Math.min(options.fadeOutSeconds ?? 0, durationSeconds),
+    );
+    const fadeStart = now + Math.max(0, durationSeconds - fadeOutSeconds);
+    const stopAt = now + durationSeconds + 0.03;
+
+    gain.gain.setValueAtTime(this.getAssetGain(asset), now);
+
+    if (fadeOutSeconds > 0) {
+      gain.gain.setValueAtTime(this.getAssetGain(asset), fadeStart);
+      gain.gain.linearRampToValueAtTime(0, now + durationSeconds);
+    }
+
     source.buffer = buffer;
     source.connect(gain).connect(masterGain);
     source.onended = () => {
+      if (this.restartableOneShots.get(asset)?.source === source) {
+        this.restartableOneShots.delete(asset);
+      }
+
       source.disconnect();
       gain.disconnect();
     };
     source.start();
+    source.stop(stopAt);
+
+    return { gain, source };
+  }
+
+  private stopRestartableOneShot(asset: OneShotAsset, fadeSeconds = 0) {
+    const node = this.restartableOneShots.get(asset);
+
+    if (!node || !this.context) {
+      return;
+    }
+
+    this.restartableOneShots.delete(asset);
+
+    const now = this.context.currentTime;
+    node.gain.gain.cancelScheduledValues(now);
+    node.gain.gain.setValueAtTime(node.gain.gain.value, now);
+
+    if (fadeSeconds > 0) {
+      node.gain.gain.linearRampToValueAtTime(0, now + fadeSeconds);
+      try {
+        node.source.stop(now + fadeSeconds + 0.03);
+      } catch {
+        // Source may already be scheduled to stop.
+      }
+    } else {
+      this.stopSource(node.source);
+    }
   }
 
   private playWindGust() {
@@ -524,6 +629,13 @@ export class TitleAudioController {
       gain.disconnect();
     });
     this.loopNodes.clear();
+
+    this.restartableOneShots.forEach(({ gain, source }) => {
+      this.stopSource(source);
+      source.disconnect();
+      gain.disconnect();
+    });
+    this.restartableOneShots.clear();
 
     if (this.activeWind) {
       this.stopSource(this.activeWind.source);

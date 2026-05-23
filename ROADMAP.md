@@ -82,6 +82,10 @@ identite visuelle, audio et premiere experience installee.
   masques par defaut, touche `V` et option de debug visuel, musique d'accueil
   isolee, hotspot oeil recentre, plateau MAP1 recadre, et fin victoire/defaite
   mieux geree.
+- [x] Corriger le second retour campagne : pas trop long coupe court, curseur
+  custom conserve sur `Reculer` et les bords, hotspot oeil resserre, flip de
+  pion sans doublon visible, et OST MAP1 relancee a chaque entree plateau sans
+  boucle.
 - [ ] Cadrer la couche histoire / secret a debloquer apres la premiere porte.
 - [ ] Cadrer les textures evolutives et changements d'ambiance pendant la
   partie.
